@@ -1,0 +1,33 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="my-upload">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+    </style>
+
+    <div class="card">
+      <div class="circle">1</div>
+      <h1>Upload</h1>
+
+
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'my-upload',
+
+      uploadStarted: function(event) {
+        console.log("Uploading '" + event.detail.file.name + "'");
+      }
+    });
+  </script>
+</dom-module>

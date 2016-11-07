@@ -1,0 +1,324 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+
+<link rel="import" href="../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
+
+<link rel="import" href="../bower_components/geo-location/geo-location.html">
+
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+
+<link rel="import" href="../bower_components/iron-icons/social-icons.html">
+
+<link rel="import" href="my-icons.html">
+
+<dom-module id="my-app">
+  <template>
+    <style>
+
+      :host {
+        display: block;
+        @apply(--paper-font-common-base);
+      }
+
+      app-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1;
+        background-color: #F44336;
+        color: white;
+      }
+
+      iron-list {
+        margin-top: 90px;
+        padding-bottom: 16px;
+      }
+
+      .photoContent {
+        @apply(--layout);
+        background-color: #ddd;
+        position: relative;
+        width: 300px;
+        height: 300px;
+        margin: 8px;
+      }
+
+      .photoContent:hover .detail{
+        opacity: 1;
+      }
+
+      .photoContent > iron-image {
+        @apply(--layout-flex);
+      }
+
+      .photoContent > .detail {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
+        color: white;
+        font-size: 20px;
+        font-weight: 100;
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 0.1s;
+      }
+
+      .searchInput {
+        @apply(--layout-flex);
+        font-size: 18px;
+        padding: 10px 20px;
+        border: none;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        -webkit-appearance: none;
+        border-radius: 0px;
+      }
+
+      .searchInput:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+      }
+
+      .searchInput:focus {
+        background-color: white;
+        outline: none;
+        color: black;
+      }
+
+      .loadingIndicator {
+        font-size: 16px;
+        text-align: center;
+        height: 60px;
+      }
+
+      .loadingIndicator paper-spinner {
+        margin-right: 20px;
+        vertical-align: middle;
+      }
+
+      @media (max-width: 800px) {
+        .photoContainer {
+          width: calc(50% - 16px);
+        }
+
+        .photoContent {
+          width: auto;
+        }
+      }
+
+      @media (max-width: 400px) {
+        iron-list {
+          margin-top: 72px;
+        }
+
+        .photoContainer {
+          width: 100%;
+        }
+
+        .photoContent > .detail {
+          opacity: 1;
+        }
+      }
+
+      ::-webkit-input-placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      ::-moz-placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      :-ms-input-placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      ::-ms-input-placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      paper-fab {
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        -webkit-transform: translateZ(0);
+        z-index: 1;
+      }
+    </style>
+
+    <!--
+    <paper-dialog modal
+      no-cancel-on-outside-click
+      no-cancel-on-esc-key
+      opened="[[_computeSignedIn(signedIn, statusKnown)]]">
+      <h2>Atenção +18</h2>
+      <p>Ao clicar em entrar você concorda com os <a href="#">termos de uso</a></p>
+      <div class="buttons">
+
+      </div>
+    </paper-dialog>
+    -->
+    <app-header reveals>
+      <app-toolbar>
+        <div main-title>Manda Nudes</div>
+
+        <paper-icon-button icon="social:person"></paper-icon-button>
+      </app-toolbar>
+    </app-header>
+
+    <iron-list items="[[nudes]]" as="nude" scroll-target="document" grid>
+      <template>
+        <div class="photoContainer">
+          <div class="photoContent" tabindex$="[[tabIndex]]">
+            <iron-image sizing="cover"
+                src="[[nude.url]]">
+            </iron-image>
+            <div class="detail">[[nude.url]]</div>
+          </div>
+        </div>
+      </template>
+    </iron-list>
+
+    <div class="loadingIndicator" hidden$="[[!loadingPhotos]]">
+      <paper-spinner active$="[[loadingPhotos]]"></paper-spinner>
+    </div>
+
+    <iron-scroll-threshold id="scrollTheshold"
+      lower-threshold="500"
+      on-lower-threshold="_onLowerThreshold"
+      scroll-target="document">
+    </iron-scroll-threshold>
+
+    <iron-ajax id="ajax"
+      loading="{{loadingPhotos}}"
+      url="[[_getAPIEndpoint(searchText, page)]]"
+      headers='{"Authorization": "Bearer [[authToken]]"}'
+      handle-as="json"
+      on-response="_didReceiveResponse">
+    </iron-ajax>
+
+    <firebase-app database-url="https://redneighbor-b.firebaseio.com"
+      auth-domain="redneighbor-b.firebaseapp.com"
+      api-key="AIzaSyBmhEGzwL4wVUcGn6ZZiHBD_Aq0gOgCSaU">
+    </firebase-app>
+
+    <firebase-auth id="auth"
+      user="{{user}}"
+      signed-in="{{signedIn}}"
+      status-known="{{statusKnown}}"
+      provider="google"
+      on-error="handleError">
+    </firebase-auth>
+
+    <geo-location high-accuracy></geo-location>
+
+    <paper-fab icon="social:whatshot"></paper-fab>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'my-app',
+
+      properties: {
+        nudes: Array,
+
+        perPage: {
+          type: Number,
+          value: 50
+        },
+
+        page: {
+          type: Number,
+          value: 0
+        },
+
+        searchText: {
+          type: String,
+          value: ''
+        },
+
+        loadingPhotos: Boolean
+      },
+
+      observers: [
+        '_resetPhotos(searchText)'
+      ],
+
+      _getAPIEndpoint: function(searchText, page) {
+        return 'https://redneighbor-b.appspot.com/api/v1/nudes' +
+            '?lat=1' +
+            '&lng=1' +
+            '&distance=999999999' +
+            '&q=' + searchText +
+            '&limit=' + this.perPage +
+            '&offset=' + (page * this.perPage);
+      },
+
+      _didReceiveResponse: function(e) {
+        var payload = e.detail.response;
+
+        if (!payload || !payload.nudes) {
+          return;
+        }
+
+        payload.nudes.forEach(function(nude) {
+          this.push('nudes', nude);
+        }, this);
+
+        this.$.scrollTheshold.clearTriggers();
+      },
+
+      _onLowerThreshold: function() {
+        this.debounce('_loadPhotos', this._loadMorePhotos, 60);
+      },
+
+      _loadMorePhotos: function() {
+        if (this.$.ajax.lastRequest) {
+          this.$.ajax.lastRequest.abort();
+        }
+        this.$.ajax.generateRequest();
+        this.page++;
+      },
+
+      _resetPhotos: function(searchText) {
+        this.page = 0;
+        this.nudes = [];
+
+        if (searchText.trim() !== '') {
+          this.debounce('_loadPhotos', this._loadMorePhotos, 400);
+        }
+      },
+
+      _computeSignedIn: function(signedIn, statusKnown) {
+          return !signedIn && statusKnown;
+      },
+
+      _signInAnonymously: function() {
+        this.$.auth.signInAnonymously()
+            .then(function(response) { console.log(response); })
+            .catch(function(error) { console.log(response); });
+      },
+    });
+  </script>
+</dom-module>
