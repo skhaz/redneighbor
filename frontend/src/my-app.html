@@ -10,9 +10,14 @@
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="../bower_components/polymerfire/firebase-app.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-storage-script.html">
+
 <link rel="import" href="../bower_components/geo-location/geo-location.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/iron-icons/social-icons.html">
@@ -62,6 +67,15 @@
         -webkit-transform: translateZ(0);
         z-index: 1;
       }
+
+      .example.preload iron-image {
+        width: 150px;
+        height: 150px;
+        background: #ddd;
+        --iron-image-placeholder: {
+          background: #939ed5;
+        };
+      }
     </style>
 
     <app-location route="{{route}}"></app-location>
@@ -83,7 +97,13 @@
         </iron-selector>
       </app-drawer>
 
-      <paper-fab on-tap="_signInAnonymously" icon="social:whatshot"></paper-fab>
+      <paper-fab on-tap="_onTap" icon="social:whatshot">
+        <input id="input"
+          type="file"
+          accept="image/jpeg, image/png"
+          on-change="_uploadNude"
+          style="position: fixed; top: -100em">
+      </paper-fab>
 
       <app-header-layout has-scrolling-region>
 
@@ -104,10 +124,23 @@
           <my-upload name="upload"></my-upload>
           <my-view404 name="view404"></my-view404>
       </iron-pages>
+
+
+        <paper-dialog id="dialog">
+          <h1>Fazendo upload...</h1>
+          <div class="example preload">
+            <!-- <paper-spinner active></paper-spinner> -->
+            <iron-image preload id="image" class="sized" sizing="contain"></iron-image>
+          </div>
+
+        </paper-dialog>
+
     </app-header-layout>
   </app-drawer-layout>
 
+
   <firebase-app database-url="https://redneighbor-b.firebaseio.com"
+    storage-Bucket="gs://redneighbor-b.appspot.com"
     auth-domain="redneighbor-b.firebaseapp.com"
     api-key="AIzaSyBmhEGzwL4wVUcGn6ZZiHBD_Aq0gOgCSaU">
   </firebase-app>
@@ -129,7 +162,20 @@
     is: 'my-app',
 
     ready: function() {
+      this.storageRef = firebase.storage().ref();
       this._signInAnonymously();
+
+      /*
+      this.$.onAuthStateChanged(function(user) {
+        if (user) {
+          console.log('Anonymous user signed-in.', user);
+          document.getElementById('file').disabled = false;
+        } else {
+          console.log('There was no anonymous session. Creating a new anonymous user.');
+          // Sign the user in anonymously since accessing Storage requires the user to be authorized.
+          auth.signInAnonymously();
+        }
+      */
     },
 
     properties: {
@@ -151,6 +197,10 @@
         type: String,
         reflectToAttribute: true,
         observer: '_pageChanged'
+      },
+
+      storageRef: {
+        type: Object,
       }
     },
 
@@ -183,13 +233,50 @@
       return !signedIn && statusKnown;
     },
 
+    _onTap: function() {
+      this.$.input.click();
+    },
+
+    _uploadNude: function(event, detail, sender) {
+      var uid = this.$.auth.user.uid;
+      var file = event.target.files[0];
+
+      var p1 = uid.slice(0, 2);
+      var p2 = uid.slice(2, 4);
+      var p3 = uid.slice(4, 6);
+      var path = ["nudes", p1, p2, p3, file.name].join("/");
+
+      var metadata = {
+        contentType: file.type,
+        customMetadata: {
+          user: uid
+        }
+      };
+
+      this.$.dialog.open();
+      var img = this.$.image;
+
+      this.storageRef.child(path).put(file, metadata).then(function(snapshot) {
+        console.log('Uploaded', snapshot.totalBytes, 'bytes.');
+        console.log(snapshot.metadata);
+        var url = snapshot.metadata.downloadURLs[0];
+        console.log('File available at', url);
+
+        // TODO use properties
+        img.src = url;
+        // alert(uid);
+        // Open dialog and show preview
+        // document.getElementById('linkbox').innerHTML = '<a href="' +  url + '">Click For File</a>';
+      }).catch(function(error) {
+        console.error('Upload failed:', error);
+        alert(error);
+      });
+    },
+
     _signInAnonymously: function() {
       this.$.auth.signInAnonymously()
-      .then(function(response) {
-        console.log(response);
-        console.log(response.credential.accessToken);
-      })
-      .catch(function(error) { console.log(response); });
+        .then(function(response) { console.log(response); })
+        .catch(function(error) { console.log(error); });
     },
   });
 </script>
