@@ -103,3 +103,10 @@ class Nude(ndb.Model):
                     search.GeoField(name='location', value=point),
                     search.DateField(name='updated', value=entity.updated),
                 ]))
+
+
+class Tag(ndb.Model):
+    """
+    Realmente preciso desse relacionamento?
+    """
+    pass

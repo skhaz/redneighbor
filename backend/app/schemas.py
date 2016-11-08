@@ -35,3 +35,13 @@ class NudeSchema(BaseSchema):
         if many:
             return {'nudes': data}
         return data
+
+
+class TagSchema(BaseSchema):
+    key = fields.Function(lambda obj: obj.key.urlsafe())
+
+    @post_dump(pass_many=True)
+    def wrap_if_many(self, data, many):
+        if many:
+            return {'nudes': data}
+        return data

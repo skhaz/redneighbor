@@ -3,7 +3,6 @@ import datetime
 from flask import request
 from flask.ext.restful import Resource
 
-from google.appengine.api import search
 from google.appengine.ext import ndb
 
 from app.api.v1.auth import requires_auth, current_user
@@ -26,3 +25,8 @@ class UserResource(Resource):
 
     def delete(self, key):
         pass
+
+
+class UserListResource(Resource):
+    def __init__(self):
+        self.schema = UserSchema()
