@@ -83,6 +83,11 @@ class Nude(ndb.Model):
 
     @classmethod
     def _update_index(cls, key, version):
+        """TODO: index tags
+
+        http://stackoverflow.com/a/16455009
+        """
+
         entity = key.get()
         if entity:
             if version < entity.version:
@@ -103,10 +108,3 @@ class Nude(ndb.Model):
                     search.GeoField(name='location', value=point),
                     search.DateField(name='updated', value=entity.updated),
                 ]))
-
-
-class Tag(ndb.Model):
-    """
-    Realmente preciso desse relacionamento?
-    """
-    pass

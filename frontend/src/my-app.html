@@ -13,6 +13,11 @@
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="../bower_components/polymerfire/firebase-app.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
@@ -20,9 +25,10 @@
 
 <link rel="import" href="../bower_components/geo-location/geo-location.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-icons/social-icons.html">
 
-<link rel="import" href="my-icons.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 
 <dom-module id="my-app">
   <template>
@@ -76,6 +82,37 @@
           background: #939ed5;
         };
       }
+
+
+      #example-sizing-contain {
+        width: 320px;
+        height: 320px;
+        background: #ddd;
+      }
+
+      #tags {
+        width: 320px;
+        --paper-input-container-focus-color: #F44336;
+      }
+
+      .flex-center-justified {
+        @apply(--layout-horizontal);
+        @apply(--layout-center-justified);
+      }
+
+      .flex-vertical {
+        @apply(--layout-vertical);
+      }
+
+      .flexchild {
+        @apply(--layout-flex);
+      }
+
+      .flex-end-justified {
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified);
+      }
+
     </style>
 
     <app-location route="{{route}}"></app-location>
@@ -86,7 +123,7 @@
       tail="{{subroute}}" />
 
     <app-drawer-layout fullbleed>
-      <app-drawer id="drawer" align="end" opened>
+      <app-drawer id="drawer" opened>
         <app-toolbar>Menu</app-toolbar>
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
           <a name="nudes" href="/nudes">Nudes</a>
@@ -109,9 +146,11 @@
 
         <app-header condenses reveals effects="waterfall">
           <app-toolbar>
+            <paper-icon-button icon="icons:menu" drawer-toggle></paper-icon-button>
             <div main-title>Manda Nudes</div>
 
-            <paper-icon-button icon="social:person" drawer-toggle></paper-icon-button>
+            <!-- <paper-icon-button icon="social:whatshot" on-tap="_onTap"></paper-icon-button> -->
+            <!-- <paper-button on-tap="_onTap">Enviar Nude</paper-button> -->
           </app-toolbar>
         </app-header>
 
@@ -120,24 +159,32 @@
           attr-for-selected="name"
           fallback-selection="view404"
           role="main">
-          <my-nudes name="nudes"></my-nudes>
+          <my-nudes name="nudes" foobar="abc"></my-nudes>
           <my-upload name="upload"></my-upload>
           <my-view404 name="view404"></my-view404>
       </iron-pages>
 
 
         <paper-dialog id="dialog">
-          <h1>Fazendo upload...</h1>
-          <div class="example preload">
-            <!-- <paper-spinner active></paper-spinner> -->
-            <iron-image preload id="image" class="sized" sizing="contain"></iron-image>
-          </div>
 
+          <paper-progress value="[[uploadProgress]]" min="0" max="100"></paper-progress>
+
+          <div class="container flex-vertical">
+            <div class="flex-center-justified">
+              <iron-image preload fade sizing="contain" id="example-sizing-contain" alt="" src="[[nudeURL]]"></iron-image>
+            </div>
+
+            <div class="flex-center-justified">
+              <paper-input id="tags" label="tags"></paper-input>
+            </div>
+
+            <div class="buttons">
+              <paper-button disabled="{{_computeNudeIsFine(nudeURL)}}" on-tap="_sendNude">Enviar</paper-button>
+            </div>
         </paper-dialog>
 
     </app-header-layout>
   </app-drawer-layout>
-
 
   <firebase-app database-url="https://redneighbor-b.firebaseio.com"
     storage-Bucket="gs://redneighbor-b.appspot.com"
@@ -153,6 +200,16 @@
     on-error="handleError">
   </firebase-auth>
 
+  <iron-ajax id="ajax"
+    loading="{{loadingPhotos}}"
+    method="POST"
+    body='{}'
+    url="https://redneighbor-b.appspot.com/api/v1/nudes"
+    headers='{{_computeHeaders()}}'
+    handle-as="json"
+    on-response="_didReceiveResponse">
+  </iron-ajax>
+
   <geo-location high-accuracy></geo-location>
 
 </template>
@@ -162,9 +219,8 @@
     is: 'my-app',
 
     ready: function() {
-      this.storageRef = firebase.storage().ref();
       this._signInAnonymously();
-
+      this.storageRef = firebase.storage().ref();
       /*
       this.$.onAuthStateChanged(function(user) {
         if (user) {
@@ -180,7 +236,7 @@
 
     properties: {
       user: {
-        type: Object
+        type: Object,
       },
 
       signedIn: {
@@ -199,14 +255,29 @@
         observer: '_pageChanged'
       },
 
+      nudeURL: {
+        type: String,
+        notify: true
+      },
+
       storageRef: {
         type: Object,
-      }
+      },
+
+      uploadProgress: {
+        type: Number,
+        notify: true
+      },
+
     },
 
     observers: [
       '_routePageChanged(routeData.page)'
     ],
+
+    _computeHeaders: function() {
+      return {"Authorization": "Bearer " + this.user.rd};
+    },
 
     handleTap: function() {
       this.page = 'upload';
@@ -234,17 +305,45 @@
     },
 
     _onTap: function() {
+      // this.page = 'upload';
       this.$.input.click();
     },
 
+    _signInAnonymously: function() {
+      this.$.auth.signInAnonymously()
+        .then(function(response) { console.log(response); })
+        .catch(function(error) { console.log(error); });
+    },
+
+    _sendNude: function() {
+      //if (!url || 0 === url.length) {
+      //  return;
+      //}
+
+      this.$.ajax.generateRequest();
+    },
+
+    _didReceiveResponse: function(e) {
+      var payload = e.detail.response;
+
+      // if (!payload || !payload.nudes) {
+      //    return;
+      //}
+
+      console.log(payload);
+    },
+
     _uploadNude: function(event, detail, sender) {
-      var uid = this.$.auth.user.uid;
+      var uid = this.user.uid;
       var file = event.target.files[0];
 
-      var p1 = uid.slice(0, 2);
-      var p2 = uid.slice(2, 4);
-      var p3 = uid.slice(4, 6);
-      var path = ["nudes", p1, p2, p3, file.name].join("/");
+      var now = new Date();
+      var year = now.getUTCFullYear();
+      var month = now.getUTCMonth() + 1;
+      var day = now.getUTCDate();
+      var p1 = uid.slice(0, 3);
+      var filename = file.name.replace(/[^A-Z0-9]+/ig, "-");
+      var path = [year, month, day, p1, filename].join("/");
 
       var metadata = {
         contentType: file.type,
@@ -254,30 +353,19 @@
       };
 
       this.$.dialog.open();
-      var img = this.$.image;
 
-      this.storageRef.child(path).put(file, metadata).then(function(snapshot) {
-        console.log('Uploaded', snapshot.totalBytes, 'bytes.');
-        console.log(snapshot.metadata);
-        var url = snapshot.metadata.downloadURLs[0];
-        console.log('File available at', url);
-
-        // TODO use properties
-        img.src = url;
-        // alert(uid);
-        // Open dialog and show preview
-        // document.getElementById('linkbox').innerHTML = '<a href="' +  url + '">Click For File</a>';
-      }).catch(function(error) {
-        console.error('Upload failed:', error);
+      var that = this;
+      var uploadTask = this.storageRef.child(path).put(file, metadata);
+      uploadTask.on('state_changed', function(snapshot) {
+        that.uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(that.uploadProgress);
+      }, function(error) {
         alert(error);
+      }, function() {
+        that.nudeURL = uploadTask.snapshot.downloadURL;
       });
     },
 
-    _signInAnonymously: function() {
-      this.$.auth.signInAnonymously()
-        .then(function(response) { console.log(response); })
-        .catch(function(error) { console.log(error); });
-    },
   });
 </script>
 </dom-module>

@@ -1,0 +1,27 @@
+# -*- coding: utf-8 -*-
+import datetime
+from flask import request
+from flask.ext.restful import Resource
+
+from google.appengine.api import search
+
+from app.api.v1.auth import requires_auth, current_user
+from app.schemas import TagSchema
+
+
+class TagResource(Resource):
+    def __init__(self):
+        self.schema = TagSchema()
+
+    def get(self, key):
+        """Return a tag with a list of nudes
+        """
+
+
+class TagListResource(Resource):
+    def __init__(self):
+        self.schema = TagSchema()
+
+    def get(self, key):
+        """Return all tags, with pagination"""
+        pass
