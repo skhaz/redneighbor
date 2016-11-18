@@ -21,7 +21,7 @@ handlers:
   login: admin
 
 - url: /favicon\.ico
-  static_files: favicon.ico
+  static_files: app/static/favicon.ico
   upload: favicon\.ico
 
 - url: /static
