@@ -42,11 +42,8 @@ def _configure_blueprints(app):
     from app.api.v1 import api_blueprint
     app.register_blueprint(api_blueprint)
 
-    from app.blueprints.site import site as site_blueprint
+    from app.site.views import site_blueprint
     app.register_blueprint(site_blueprint)
-
-    # from app.tasks import tasks as tasks_blueprint
-    # app.register_blueprint(tasks_blueprint, url_prefix='/tasks')
 
 
 def _configure_logging(app):

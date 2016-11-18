@@ -13,7 +13,7 @@ nearby.add_argument('lng', type=float, default=0.0)
 nearby.add_argument('distance', type=int, default=1000)
 
 
-api_blueprint = Blueprint("api", __name__, url_prefix='/api/v1')
+api_blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
 api = Api(api_blueprint)
 
 from . import auth, users, nudes, tags  # noqa
