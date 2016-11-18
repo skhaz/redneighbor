@@ -20,6 +20,13 @@ handlers:
   script: google.appengine.ext.deferred.deferred.application
   login: admin
 
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+
+- url: /static
+  static_dir: app/static
+
 - url: .*
   script: main.app
   secure: always
