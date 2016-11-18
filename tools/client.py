@@ -18,6 +18,7 @@ from google.appengine.ext.remote_api import remote_api_stub
 os.environ['HTTP_HOST'] = "%s.appspot.com" % 'redneighbor-b'
 sys.path.insert(1, '..')
 
+
 def main(project_id):
     remote_api_stub.ConfigureRemoteApiForOAuth(
         '{}.appspot.com'.format(project_id),
