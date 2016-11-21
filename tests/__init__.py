@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import dev_appserver
 from google.appengine.ext import vendor
 

@@ -42,7 +42,7 @@ def _configure_blueprints(app):
     from app.api.v1 import api_blueprint
     app.register_blueprint(api_blueprint)
 
-    from app.site.views import site_blueprint
+    from app.site.views import site as site_blueprint
     app.register_blueprint(site_blueprint)
 
 
