@@ -9,7 +9,7 @@ from google.appengine.ext import ndb
 from app.api.v1.auth import requires_auth, current_user
 from app.models import User, Nude
 from app.schemas import NudeSchema
-from app.core.cache import cache, args_cache_key
+from app.kernel.cache import cache, args_cache_key
 
 
 class NudeResource(Resource):

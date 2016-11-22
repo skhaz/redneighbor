@@ -15,7 +15,7 @@ import jwt
 from jwt.exceptions import InvalidTokenError
 from jwt.contrib.algorithms.pycrypto import RSAAlgorithm
 
-from app.core.cache import cache
+from app.kernel.cache import cache
 from app.models import User
 
 FIREBASE_CERTIFICATES_URL = (

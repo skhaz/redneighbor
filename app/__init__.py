@@ -24,7 +24,7 @@ def _configure_app(app, config=None):
 
 
 def _configure_cache(app):
-    from app.core.cache import cache
+    from app.kernel.cache import cache
     cache.init_app(app, config={'CACHE_TYPE': 'gaememcached'})
 
 
