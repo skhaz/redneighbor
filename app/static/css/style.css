@@ -1,0 +1,14 @@
+.mdl-layout__content {
+  height: 100vh;
+}
+
+.mdl-layout__header-row {
+  padding: 0 16px 0 16px;
+}
+
+#map {
+  width: auto;
+  height: 100%;
+  overflow: hidden;
+  max-width: none;
+}

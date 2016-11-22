@@ -1,0 +1,299 @@
+{% extends "layout.html" %}
+
+{% block title %}Mapa - {% endblock %}
+
+{% block head %}
+  {{ super() }}
+{% endblock %}
+
+
+{% block content %}
+  <div id="map"></div>
+{% endblock %}
+
+{% block footer %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-marker-clusterer/1.0.0/markerclusterer_compiled.js"></script>
+  <script>
+  var styledMapArray = [
+      {
+          "featureType": "administrative.locality",
+          "elementType": "all",
+          "stylers": [
+              {
+                  "hue": "#2c2e33"
+              },
+              {
+                  "saturation": 7
+              },
+              {
+                  "lightness": 19
+              },
+              {
+                  "visibility": "on"
+              }
+          ]
+      },
+      {
+          "featureType": "landscape",
+          "elementType": "all",
+          "stylers": [
+              {
+                  "hue": "#ffffff"
+              },
+              {
+                  "saturation": -100
+              },
+              {
+                  "lightness": 100
+              },
+              {
+                  "visibility": "simplified"
+              }
+          ]
+      },
+      {
+          "featureType": "poi",
+          "elementType": "all",
+          "stylers": [
+              {
+                  "hue": "#ffffff"
+              },
+              {
+                  "saturation": -100
+              },
+              {
+                  "lightness": 100
+              },
+              {
+                  "visibility": "off"
+              }
+          ]
+      },
+      {
+          "featureType": "road",
+          "elementType": "geometry",
+          "stylers": [
+              {
+                  "hue": "#bbc0c4"
+              },
+              {
+                  "saturation": -93
+              },
+              {
+                  "lightness": 31
+              },
+              {
+                  "visibility": "simplified"
+              }
+          ]
+      },
+      {
+          "featureType": "road",
+          "elementType": "labels",
+          "stylers": [
+              {
+                  "hue": "#bbc0c4"
+              },
+              {
+                  "saturation": -93
+              },
+              {
+                  "lightness": 31
+              },
+              {
+                  "visibility": "on"
+              }
+          ]
+      },
+      {
+          "featureType": "road.arterial",
+          "elementType": "labels",
+          "stylers": [
+              {
+                  "hue": "#bbc0c4"
+              },
+              {
+                  "saturation": -93
+              },
+              {
+                  "lightness": -2
+              },
+              {
+                  "visibility": "simplified"
+              }
+          ]
+      },
+      {
+          "featureType": "road.local",
+          "elementType": "geometry",
+          "stylers": [
+              {
+                  "hue": "#e9ebed"
+              },
+              {
+                  "saturation": -90
+              },
+              {
+                  "lightness": -8
+              },
+              {
+                  "visibility": "simplified"
+              }
+          ]
+      },
+      {
+          "featureType": "transit",
+          "elementType": "all",
+          "stylers": [
+              {
+                  "hue": "#e9ebed"
+              },
+              {
+                  "saturation": 10
+              },
+              {
+                  "lightness": 69
+              },
+              {
+                  "visibility": "on"
+              }
+          ]
+      },
+      {
+          "featureType": "water",
+          "elementType": "all",
+          "stylers": [
+              {
+                  "hue": "#e9ebed"
+              },
+              {
+                  "saturation": -78
+              },
+              {
+                  "lightness": 67
+              },
+              {
+                  "visibility": "simplified"
+              }
+          ]
+      }
+  ];
+
+  function initMap() {
+    google.maps.event.addDomListener(window, 'load', function() {
+      var spinner = document.getElementById('spinner');
+
+      var map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: -14.2350, lng: -51.9253},
+        zoom: 5,
+        minZoom: 5,
+        maxZoom: 16,
+        disableDefaultUI: true,
+        zoomControl: true
+      });
+
+      map.mapTypes.set('styled_map', new google.maps.StyledMapType(styledMapArray));
+      map.setMapTypeId('styled_map');
+
+      var infowindow = new google.maps.InfoWindow({
+        disableAutoPan: false
+      });
+
+      var markerCluster = new MarkerClusterer(map, [], { imagePath: '{{ url_for("static", filename="maps/m") }}' });
+
+      function addMarker(nude) {
+        var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(nude.lat, nude.lng),
+          data: nude
+        });
+
+        google.maps.event.addListener(marker, 'click', function() {
+          var contentString = "<img style='width:128px;height:128px;' src='"+  marker.data.url + "'>";
+
+          infowindow.close();
+          infowindow.setContent(contentString);
+          infowindow.open(map, marker);
+        });
+
+        markerCluster.addMarker(marker);
+      }
+
+      function downloadUrl(url, callback) {
+        var request = window.ActiveXObject ?
+          new ActiveXObject('Microsoft.XMLHTTP') :
+          new XMLHttpRequest();
+
+        request.onreadystatechange = function() {
+          if (request.readyState === 4) {
+            request.onreadystatechange = doNothing;
+            callback(request.responseText, request.status);
+          }
+        };
+
+        request.open('GET', url, true);
+        request.send(null);
+      }
+
+      function doNothing() {
+      }
+
+      // TODO round
+      var centeredAt = new google.maps.LatLng();
+
+      google.maps.event.addListener(map, 'idle', function() {
+        if (google.maps.geometry.spherical.computeDistanceBetween(map.getCenter(), centeredAt) < 500) {
+          return;
+        }
+
+        spinner.classList.add('is-active');
+        markerCluster.clearMarkers();
+        infowindow.close();
+
+        var limit = 1000;
+        var radius = 6378.8;
+        var bounds = map.getBounds();
+        var center = bounds.getCenter();
+        var lat = center.lat();
+        var lng = center.lng();
+        var ne = bounds.getNorthEast();
+        var lat1 = ne.lat() / 57.2958;
+        var lng1 = ne.lng() / 57.2958;
+        var lat2 = lat / 57.2958;
+        var lng2 = lng / 57.2958;
+
+        var distance = radius * Math.acos(
+          Math.sin(lat2) * Math.sin(lat1) +
+          Math.cos(lat2) * Math.cos(lat1) *
+          Math.cos(lng1 - lng2)
+        );
+
+        var url = '/api/v1/nudes' +
+          '?lat=' + lat +
+          '&lng=' + lng +
+          '&distance=' + Math.floor(distance * 1000) +
+          '&limit=' + limit;
+
+        downloadUrl(url, function(json) {
+          var payload = JSON.parse(json);
+
+          console.log("nudes: " + payload.nudes.length);
+          payload.nudes.forEach(function(nude) {
+            addMarker(nude)
+          }, this);
+
+          centeredAt = center;
+          spinner.classList.remove('is-active');
+        });
+      });
+
+      google.maps.event.addListener(map, "click", function(event) {
+        infowindow.close();
+      });
+    });
+  }
+  </script>
+
+  <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?callback=initMap&libraries=geometry&key=AIzaSyAoMXjq-vmAOzoJVt8UCBppNaZar2ciy24"></script>
+  {{ super() }}
+{% endblock %}

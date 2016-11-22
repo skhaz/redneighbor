@@ -7,7 +7,7 @@ site = Blueprint('site', __name__, template_folder='templates')
 
 @site.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('map.html')
 
 
 @site.route('/upload')
@@ -15,6 +15,6 @@ def upload():
     return render_template('upload.html')
 
 
-@site.route('/nudes/<string:key>')
+@site.route('/nude/<string:key>')
 def nude():
-    return render_template('upload.html')
+    return render_template('nude.html')
