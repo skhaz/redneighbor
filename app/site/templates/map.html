@@ -21,7 +21,7 @@
       var spinner = document.getElementById('spinner');
 
       var map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: -14.2350, lng: -51.9253},
+        center: {lat: {{ lat }}, lng: {{ lng }} },
         zoom: 5,
         minZoom: 5,
         maxZoom: 16,
@@ -112,7 +112,6 @@
         downloadUrl(url, function(json) {
           var payload = JSON.parse(json);
 
-          console.log("nudes: " + payload.nudes.length);
           payload.nudes.forEach(function(nude) {
             addMarker(nude)
           }, this);
@@ -129,7 +128,6 @@
   }
   </script>
 
-  <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?callback=initMap&libraries=geometry&key=AIzaSyAoMXjq-vmAOzoJVt8UCBppNaZar2ciy24"></script>
   {{ super() }}
 {% endblock %}

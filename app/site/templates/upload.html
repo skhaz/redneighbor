@@ -1,1 +1,183 @@
 {% extends "layout.html" %}
+
+{% block head %}
+  {{ super() }}
+
+  <style>
+  .demo-list-icon {
+    width: 300px;
+  }
+
+  .mdl-layout {
+    align-items: center;
+  }
+  </style>
+{% endblock %}
+
+{% block content %}
+<input type="file" id="input" name="file" style="position: fixed; top: -100em" />
+
+<!-- <div class="mdl-layout"> -->
+
+<ul class="demo-list-icon mdl-list">
+
+  <li class="mdl-list__item">
+    <span class="mdl-list__item-primary-content">
+      <img id="preview" width="200" height="200" src="http://i.stack.imgur.com/aEEkn.png" />
+    </span>
+  </li>
+
+  <li class="mdl-list__item">
+    <span class="mdl-list__item-primary-content">
+      <div id="p3" class="mdl-progress mdl-js-progress"></div>
+    </span>
+  </li>
+
+
+  <li class="mdl-list__item">
+    <span class="mdl-list__item-primary-content">
+      <div class="mdl-textfield mdl-js-textfield" style="width: 100%;">
+        <input id="tags" class="mdl-textfield__input" type="text">
+        <label class="mdl-textfield__label" for="sample1">#hashtags</label>
+      </div>
+    </span>
+  </li>
+
+    <li class="mdl-list__item">
+      <span class="mdl-list__item-primary-content">
+        <button id="upload" class="mdl-button mdl-js-button mdl-button--raised">
+          Enviar
+        </button>
+      </span>
+    </li>
+
+    </ul>
+{% endblock %}
+
+{% block footer %}
+  <script>
+  var uploadButton = document.getElementById('upload');
+  var tags = document.getElementById('tags');
+  var progressBar = document.querySelector('#p3');
+  var auth = firebase.auth();
+  var storageRef = firebase.storage().ref();
+  var downloadURL = null;
+  var lat = {{ lat }};
+  var lng = {{ lng }};
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+    lat = position.coords.latitude;
+    lng = position.coords.longitude;
+    }, function() {
+      //
+    });
+  }
+
+  function handleFileSelect(event) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    var previewImage = document.getElementById('preview');
+    var file = event.target.files[0];
+
+    if (FileReader && file) {
+        var reader = new FileReader();
+        reader.onload = function () {
+          previewImage.src = reader.result;
+        }
+        reader.readAsDataURL(file);
+    }
+
+    var uid = auth.currentUser.uid;
+    var now = new Date();
+    var year = now.getUTCFullYear();
+    var month = now.getUTCMonth() + 1;
+    var day = now.getUTCDate();
+    var p1 = uid.slice(0, 3);
+    var filename = file.name.replace(/[^A-Z0-9]+/ig, "-");
+    var path = [year, month, day, p1, filename].join("/");
+
+    var metadata = {
+      contentType: file.type,
+      customMetadata: {
+        user: uid
+      }
+    };
+
+    var uploadTask = storageRef.child(path).put(file, metadata);
+    uploadTask.on('state_changed', function(snapshot) {
+      var uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      console.log(uploadProgress);
+      progressBar.MaterialProgress.setProgress(uploadProgress);
+    }, function(error) {
+      alert(error);
+    }, function() {
+      var url = uploadTask.snapshot.downloadURL;
+      downloadURL = uploadTask.snapshot.downloadURL;
+      uploadButton.disabled = false;
+      console.log(url);
+    });
+  }
+
+  function publishNude(payload, token, callback) {
+    var request = window.ActiveXObject ?
+      new ActiveXObject('Microsoft.XMLHTTP') :
+      new XMLHttpRequest();
+
+    request.onreadystatechange = function() {
+      if (request.readyState === 4) {
+        request.onreadystatechange = doNothing;
+        callback(request.responseText, request.status);
+      }
+    };
+
+    request.open("POST", "/api/v1/nudes");
+    request.setRequestHeader("Authorization", "Bearer " + token);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.send(JSON.stringify(payload));
+  }
+
+  function doNothing() {
+  }
+
+  function upload() {
+    uploadButton.disabled = true;
+
+    auth.currentUser.getToken(/* forceRefresh true */)
+      .then(function(token) {
+        var request = window.ActiveXObject ?
+          new ActiveXObject('Microsoft.XMLHTTP') :
+          new XMLHttpRequest();
+
+          // TODO var lat = ... || {{ lat }};
+
+          var payload = {
+            'lat': lat,
+            'lng': lng,
+            'url': downloadURL,
+            'tags': tags.value
+          };
+
+          publishNude(payload, token, function(json) {
+              var payload = JSON.parse(json);
+
+              window.location.href = '/nude/' + payload.key;
+          });
+    });
+  }
+
+  window.onload = function() {
+    var input = document.getElementById('input');
+    var previewImage = document.getElementById('preview');
+
+    input.addEventListener('change', handleFileSelect, false);
+    previewImage.addEventListener('click', function() { input.click(); }, false);
+
+    uploadButton.addEventListener('click', function() { upload(); }, false);
+    uploadButton.disabled = true;
+    // document.getElementById('file').disabled = true;
+  }
+  </script>
+  {{ super() }}
+{% endblock %}

@@ -82,6 +82,7 @@ class NudeListResource(Resource):
             location=ndb.GeoPt(data['lat'], data['lng']),
             owner=current_user.key,
             url=data['url'],
+            tags=data['tags'],
             public=True)
         nude.put()
         return self.schema.dump(nude).data

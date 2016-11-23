@@ -14,6 +14,7 @@ except ImportError:
 
 from google.appengine.ext import ndb
 from google.appengine.ext.remote_api import remote_api_stub
+from google.appengine.api import memcache
 
 os.environ['HTTP_HOST'] = "%s.appspot.com" % 'redneighbor-b'
 sys.path.insert(1, '..')
@@ -24,13 +25,15 @@ def main(project_id):
         '{}.appspot.com'.format(project_id),
         '/_ah/remote_api')
 
-    from app.models import Nude
-    nudes = Nude.query()
-    for nude in nudes:
-        nude.deleted = True
-        nude.public = False
-        nude.put()
+    # if flush:
+    #from app.models import Nude
+    #nudes = Nude.query()
+    #for nude in nudes:
+    #    nude.deleted = True
+    #    nude.public = False
+    #    nude.put()
 
+    memcache.flush_all()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

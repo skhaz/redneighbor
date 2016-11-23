@@ -50,16 +50,12 @@ class Nude(ndb.Model):
     public = ndb.BooleanProperty(default=False)
     version = ndb.IntegerProperty(default=0)
     owner = ndb.KeyProperty(kind=User, required=True)
-    tags = ndb.StringProperty(repeated=True)
     likes = ndb.KeyProperty(kind=User, repeated=True)  # or in User's model?
+    tags = ndb.StringProperty(repeated=True, indexed=True,
+                              validator=lambda p, v: v.lower())
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     deleted = ndb.BooleanProperty(default=False)
-
-    def soft_delete(self):
-        self.deleted = True
-        self.public = False
-        self.put()
 
     def __repr__(self):
         return "%s(%s)" % (self.__class__.__name__, self.key.id())
@@ -83,11 +79,6 @@ class Nude(ndb.Model):
 
     @classmethod
     def _update_index(cls, key, version):
-        """TODO: index tags
-
-        http://stackoverflow.com/a/16455009
-        """
-
         entity = key.get()
         if entity:
             if version < entity.version:
