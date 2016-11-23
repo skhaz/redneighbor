@@ -44,8 +44,8 @@ def _configure_blueprints(app):
     from app.api.v1 import api_blueprint
     app.register_blueprint(api_blueprint)
 
-    from app.web.views import site as site_blueprint
-    app.register_blueprint(site_blueprint)
+    from app.web.views import web as web_blueprint
+    app.register_blueprint(web_blueprint)
 
 
 def _configure_error_handlers(app):
