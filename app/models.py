@@ -51,8 +51,7 @@ class Nude(ndb.Model):
     version = ndb.IntegerProperty(default=0)
     owner = ndb.KeyProperty(kind=User, required=True)
     likes = ndb.KeyProperty(kind=User, repeated=True)  # or in User's model?
-    tags = ndb.StringProperty(repeated=True, indexed=True,
-                              validator=lambda p, v: v.lower())
+    tags = ndb.StringProperty(repeated=True, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     deleted = ndb.BooleanProperty(default=False)

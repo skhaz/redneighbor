@@ -76,7 +76,6 @@ class NudeListResource(Resource):
 
     @requires_auth
     def post(self):
-        # lat_long = request.headers['X-AppEngine-CityLatLong'].split(',')
         data, errors = self.schema.load(request.get_json(), partial=True)
         nude = Nude(
             location=ndb.GeoPt(data['lat'], data['lng']),

@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<img height="300" width="300" src="{{ nude.url }}" />
+
+<ul>
+{% for tag in nude.tags %}
+  <li><a href="/tag/{{ tag }}">#{{ tag }}</a></li>
+{% endfor %}
+</ul>
+{% endblock  %}

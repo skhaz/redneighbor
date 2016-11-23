@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from flask import request, render_template, abort
+from flask import Blueprint, request, render_template
 from google.appengine.ext import ndb
 from app.kernel.cache import cache
-from flask import Blueprint
 
 X_APPENGINE_REGION = 'X-AppEngine-Region'
 X_APPENGINE_CITY = 'X-AppEngine-City'
@@ -25,7 +24,7 @@ def index():
 
 
 @site.route('/upload')
-#@cache.cached(timeout=3600, key_prefix=geolocation_cache_key)
+@cache.cached(timeout=3600, key_prefix=geolocation_cache_key)
 def upload():
     lat, lng = request.headers.get(X_APPENGINE_CITYLATLONG, DEFAULT_COORDINATES).split(',')
     return render_template('upload.html', **locals())
@@ -35,10 +34,15 @@ def upload():
 @cache.cached(timeout=600)
 def nude(key):
     nude = ndb.Key(urlsafe=key).get()
-    return render_template('nude.html', url=nude.url)
+    return render_template('nude.html', nude=nude)
 
 
 @site.route('/tag/<string:key>')
 @cache.cached(timeout=600)
 def tag(key):
     return render_template('tag.html')
+
+
+@site.route('/admin/')
+def admin():
+    return render_template('admin.html')

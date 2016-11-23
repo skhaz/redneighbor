@@ -8,7 +8,6 @@ class BaseSchema(Schema):
     TODO:
     http://marshmallow.readthedocs.io/en/latest/extending.html#example-enveloping
     """
-
     pass
 
 
@@ -40,7 +39,7 @@ class NudeSchema(BaseSchema):
 
     @pre_load
     def parse_tags(self, data):
-        data['tags'] = set(re.sub(r'[^a-zA-Z0-9 ]', r'', data['tags']).split())
+        data['tags'] = [tag[:32] for tag in set(re.sub(r'[^a-zA-Z0-9 ]', r'', data['tags'].lower()).split())]
 
     @post_dump(pass_many=True)
     def wrap_if_many(self, data, many):

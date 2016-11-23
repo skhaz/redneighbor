@@ -24,7 +24,7 @@
         center: {lat: {{ lat }}, lng: {{ lng }} },
         zoom: 5,
         minZoom: 5,
-        maxZoom: 16,
+        maxZoom: 21,
         disableDefaultUI: true,
         zoomControl: true
       });
@@ -39,6 +39,21 @@
       var markerCluster = new MarkerClusterer(map, [], { imagePath: '{{ url_for("static", filename="maps/m") }}' });
 
       function addMarker(nude) {
+
+        /*
+        var allMarkers = markerCluster.getMarkers();
+        if (allMarkers.length != 0) {
+          for (i=0; i < allMarkers.length; i++) {
+            var existingMarker = allMarkers[i];
+            var pos = existingMarker.getPosition();
+
+            if (latlng.equals(pos)) {
+              text = text + " & " + content[i];
+            }
+          }
+        }
+        */
+
         var marker = new google.maps.Marker({
           position: new google.maps.LatLng(nude.lat, nude.lng),
           data: nude
