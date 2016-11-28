@@ -62,6 +62,7 @@
       storageBucket: "redneighbor-b.appspot.com"
     });
 
+    /*
     var auth = firebase.auth();
     auth.onAuthStateChanged(function(user) {
       if (user) {
@@ -77,14 +78,17 @@
         auth.signInAnonymously();
       }
     });
-
+    */
     {% if not DEBUG %}
-      /* google analytics */
+    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+    ga('create', 'UA-60395403-2', 'auto');
+    ga('send', 'pageview');
     {% endif %}
     </script>
 
     {% block footer %}
     <script defer src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
     {% endblock %}
   </body>
 </html>

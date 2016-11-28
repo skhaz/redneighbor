@@ -3,6 +3,8 @@
 {% block head %}
   {{ super() }}
 
+  <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.css" />
+
   <style>
   .demo-list-icon {
     width: 300px;
@@ -15,7 +17,28 @@
 {% endblock %}
 
 {% block content %}
+<dialog class="mdl-dialog">
+  <h4 class="mdl-dialog__title">Allow data collection?</h4>
+  <div class="mdl-dialog__content">
+    <div id="firebaseui-auth-container"></div>
+  </div>
+  <div class="mdl-dialog__actions">
+    <button type="button" class="mdl-button">Agree</button>
+    <button type="button" class="mdl-button close">Disagree</button>
+  </div>
+</dialog>
+
+
 <input type="file" id="input" name="file" style="position: fixed; top: -100em" />
+
+
+
+
+
+
+
+
+
 
 <!-- <div class="mdl-layout"> -->
 
@@ -55,10 +78,25 @@
 {% endblock %}
 
 {% block footer %}
-  <script>
+<script src="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.js"></script>
+
+<script>
+  function trackAllowedGeo(allowed) {
+    try {
+      ga('send', 'event', {
+        'eventCategory': 'Upload',
+        'eventAction': 'GeoLocation',
+        'eventValue': allowed
+      });
+    } catch (e) { }
+  }
+
+
+
   var uploadButton = document.getElementById('upload');
   var tags = document.getElementById('tags');
   var progressBar = document.querySelector('#p3');
+  var dialog = document.querySelector('dialog');
   var auth = firebase.auth();
   var storageRef = firebase.storage().ref();
   var downloadURL = null;
@@ -67,10 +105,14 @@
 
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
-    lat = position.coords.latitude;
-    lng = position.coords.longitude;
-    }, function() {
-      //
+      lat = position.coords.latitude;
+      lng = position.coords.longitude;
+      trackAllowedGeo(true);
+    },
+    function (error) {
+      if (error.code == error.PERMISSION_DENIED) {
+        trackAllowedGeo(false);
+      }
     });
   }
 
@@ -144,7 +186,8 @@
   function upload() {
     uploadButton.disabled = true;
 
-    auth.currentUser.getToken(/* forceRefresh true */)
+    /*
+    auth.currentUser.getToken( forceRefresh true )
       .then(function(token) {
         var request = window.ActiveXObject ?
           new ActiveXObject('Microsoft.XMLHTTP') :
@@ -165,6 +208,7 @@
               window.location.href = '/nude/' + payload.key;
           });
     });
+    */
   }
 
   window.onload = function() {
@@ -177,7 +221,83 @@
     uploadButton.addEventListener('click', function() { upload(); }, false);
     uploadButton.disabled = true;
     // document.getElementById('file').disabled = true;
+
+    var dialog = document.querySelector('dialog');
+    // dialog.showModal();
+
+    dialog.querySelector('.close').addEventListener('click', function() {
+      dialog.close();
+    });
   }
+
+
+  initApp = function() {
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        // User is signed in.
+        console.log('User is signed in.');
+        console.log('User is Anonymous? ', user.isAnonymous);
+
+        var displayName = user.displayName;
+        var email = user.email;
+        var emailVerified = user.emailVerified;
+        var photoURL = user.photoURL;
+        var uid = user.uid;
+        var providerData = user.providerData;
+        console.log('displayName', displayName);
+        console.log('email', email);
+
+        user.getToken().then(function(accessToken) {
+          console.log('accessToken', accessToken);
+          /*
+          document.getElementById('sign-in-status').textContent = 'Signed in';
+          document.getElementById('sign-in').textContent = 'Sign out';
+          document.getElementById('account-details').textContent = JSON.stringify({
+            displayName: displayName,
+            email: email,
+            emailVerified: emailVerified,
+            photoURL: photoURL,
+            uid: uid,
+            accessToken: accessToken,
+            providerData: providerData
+          }, null, '  ');
+          */
+        });
+      } else {
+        console.log('User is signed out.');
+        dialog.showModal();
+        // document.getElementById('sign-in-status').textContent = 'Signed out';
+        // document.getElementById('sign-in').textContent = 'Sign in';
+        // document.getElementById('account-details').textContent = 'null';
+      }
+    }, function(error) {
+      console.log(error);
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", function(event) {
+  // window.addEventListener('load', function() {
+    initApp()
+  });
+
+window.addEventListener('load', function() {
+  var uiConfig = {
+    'signInSuccessUrl': '/upload',
+    'signInOptions': [
+      firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+      firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+      firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+      // firebase.auth.GithubAuthProvider.PROVIDER_ID,
+      firebase.auth.EmailAuthProvider.PROVIDER_ID
+    ],
+    // Terms of service url.
+    'tosUrl': '/tos',
+  };
+
+  var ui = new firebaseui.auth.AuthUI(firebase.auth());
+  ui.start('#firebaseui-auth-container', uiConfig);
+});
   </script>
+
   {{ super() }}
 {% endblock %}

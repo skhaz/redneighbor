@@ -19,6 +19,7 @@ def geolocation_cache_key():
 @site.route('/')
 @cache.cached(timeout=3600, key_prefix=geolocation_cache_key)
 def index():
+    import logging
     lat, lng = request.headers.get(X_APPENGINE_CITYLATLONG, DEFAULT_COORDINATES).split(',')
     return render_template('map.html', **locals())
 
