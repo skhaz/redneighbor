@@ -91,9 +91,6 @@ def verify_auth_token(token):
                 os.environ['FIREBASE_PROJECT_ID']))
     except InvalidTokenError as e:
         logging.warning('JWT verification failed: {}'.format(e))
-        return None
-
-    return claims
 
 
 def requires_auth(func):
