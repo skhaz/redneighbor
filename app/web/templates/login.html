@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block head %}
+  {{ super() }}
+  <link type="text/css" rel="stylesheet" href="//cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.css" />
+{% endblock  %}
+
+{% block content %}
+  <div id="firebaseui-auth-container"></div>
+{% endblock  %}
+
+{% block footer %}
+  <script src="//cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.js"></script>
+  <script>
+    window.addEventListener('load', function() {
+      var uiConfig = {
+        'signInSuccessUrl': '/upload',
+        'signInOptions': [
+          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+          firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+          firebase.auth.EmailAuthProvider.PROVIDER_ID
+        ],
+
+        // Terms of service url.
+        'tosUrl': '/tos',
+      };
+
+      var ui = new firebaseui.auth.AuthUI(firebase.auth());
+      ui.start('#firebaseui-auth-container', uiConfig);
+    });
+  </script>
+
+  {{ super() }}
+{% endblock  %}
