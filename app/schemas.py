@@ -6,10 +6,10 @@ from cloudinary import CloudinaryImage
 
 
 class BaseSchema(Schema):
-    """ TODO:
-    http://marshmallow.readthedocs.io/en/latest/extending.html#example-enveloping
-    """
-    pass
+
+    @post_dump(pass_many=True)
+    def wrap_with_envelope(self, data, many):
+        return {'result': data} if many else data
 
 
 class UserSchema(BaseSchema):
@@ -22,14 +22,8 @@ class UserSchema(BaseSchema):
     gender = fields.String()
     last_seen = fields.DateTime(load_from='updated')
 
-    @post_dump(pass_many=True)
-    def wrap_if_many(self, data, many):
-        if many:
-            return {'users': data}
-        return data
 
-
-class NudeSchema(BaseSchema):
+class NudeSchema(Schema):
     key = fields.Function(lambda obj: obj.key.urlsafe())
     lat = fields.Function(lambda obj: obj.location.lat)
     lng = fields.Function(lambda obj: obj.location.lon)
@@ -52,20 +46,10 @@ class NudeSchema(BaseSchema):
 
     @pre_load
     def parse_tags(self, data):
-        data['tags'] = [tag[:32] for tag in set(re.sub(r'[^a-zA-Z0-9 ]', r'', data['tags'].lower()).split())]
-
-    @post_dump(pass_many=True)
-    def wrap_if_many(self, data, many):
-        if many:
-            return {'nudes': data}
-        return data
+        lowered = data['tags'].lower()
+        splitted = re.sub(r'[^a-zA-Z0-9 ]', r'', lowered).split()
+        data['tags'] = [tag[:32] for tag in set(splitted)]
 
 
 class TagSchema(BaseSchema):
     key = fields.Function(lambda obj: obj.key.urlsafe())
-
-    @post_dump(pass_many=True)
-    def wrap_if_many(self, data, many):
-        if many:
-            return {'tags': data}
-        return data

@@ -24,16 +24,8 @@ class NudeResource(Resource):
         return self.schema.dump(self._get(key)).data
 
     @requires_auth
-    def put(self, key):
-        nude = self._get(key)
-        if current_user.owns(nude):
-            data, errors = self.schema.load(request.get_json(), partial=True)
-            nude.url = data.get('url', nude.url)
-            nude.put()
-            # TODO
-            self.schema.dump(nude).data
-        else:
-            abort(403)
+    def patch(self, key):
+        pass
 
     @requires_auth
     def delete(self, key):
@@ -76,12 +68,9 @@ class NudeListResource(Resource):
 
     @requires_auth
     def post(self):
-        data, errors = self.schema.load(request.get_json(), partial=True)
-        nude = Nude(
-            location=ndb.GeoPt(data['lat'], data['lng']),
-            owner=current_user.key,
-            url=data['url'],
-            tags=data['tags'],
-            public=True)
+        result, errors = self.schema.load(request.get_json(), partial=True)
+        nude = Nude(**result)
+        nude.owner = current_user.key
+        nude.public = True # temporary
         nude.put()
         return self.schema.dump(nude).data

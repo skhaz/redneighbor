@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime
-from flask import request
 from flask.ext.restful import Resource
-
-from google.appengine.api import search
-
-from app.api.v1.auth import requires_auth, current_user
 from app.schemas import TagSchema
 
 
