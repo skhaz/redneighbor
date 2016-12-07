@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
 from marshmallow import Schema, fields, post_dump, pre_load
+from cloudinary.utils import cloudinary_url
+from cloudinary import CloudinaryImage
 
 
 class BaseSchema(Schema):
-    """
-    TODO:
+    """ TODO:
     http://marshmallow.readthedocs.io/en/latest/extending.html#example-enveloping
     """
     pass
@@ -32,10 +33,22 @@ class NudeSchema(BaseSchema):
     key = fields.Function(lambda obj: obj.key.urlsafe())
     lat = fields.Function(lambda obj: obj.location.lat)
     lng = fields.Function(lambda obj: obj.location.lon)
-    url = fields.String()
     tags = fields.List(fields.String)
     gender = fields.String(load_from='owner.gender')
     updated = fields.DateTime()
+    url = fields.Method('compose_url')
+
+    def compose_url(self, data):
+        return CloudinaryImage(data.url, type='fetch').build_url(
+            width=640,
+            height=480,
+            quality=50,
+            crop='pad',
+            format='jpg',
+            angle='exif',
+            effect='trim',
+            flags='strip_profile'
+        )
 
     @pre_load
     def parse_tags(self, data):

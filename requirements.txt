@@ -4,3 +4,4 @@ Flask-RESTful==0.3.5
 marshmallow==2.10.2
 requests-toolbelt==0.7.0
 PyJWT==1.4.2
+cloudinary==1.5.0

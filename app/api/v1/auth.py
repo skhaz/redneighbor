@@ -31,6 +31,7 @@ current_user = LocalProxy(lambda: _request_ctx_stack.top.current_user)
 @cache.memoize(timeout=3600)
 def get_firebase_certificates():
     try:
+        urlfetch.set_default_fetch_deadline(300)
         result = urlfetch.Fetch(
             FIREBASE_CERTIFICATES_URL,
             validate_certificate=True)

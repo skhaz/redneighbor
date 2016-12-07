@@ -33,7 +33,7 @@ def _configure_cache(app):
 def _configure_jinja2(app):
     @app.context_processor
     def inject():
-        return dict(DEBUG=app.debug)
+        return dict(DEBUG=True)  # app.debug)
 
 
 def _configure_hooks(app):

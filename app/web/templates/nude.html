@@ -1,11 +1,58 @@
 {% extends "layout.html" %}
 
-{% block content %}
-<img height="300" width="300" src="{{ nude.url }}" />
 
-<ul>
-{% for tag in nude.tags %}
-  <li><a href="/tag/{{ tag }}">#{{ tag }}</a></li>
-{% endfor %}
-</ul>
+{% block head %}
+  {{ super() }}
+  <style>
+
+  img.ri
+  {
+  	position: absolute;
+  	max-width: 80%;
+  	top: 10%;
+  	left: 10%;
+  	/* border-radius: 3px;
+  	box-shadow: 0 3px 6px rgba(0,0,0,0.9);
+    */
+  }
+
+  img.ri:empty
+  {
+  	top: 50%;
+  	left: 50%;
+  	-webkit-transform: translate(-50%, -50%);
+  	-moz-transform: translate(-50%, -50%);
+  	-ms-transform: translate(-50%, -50%);
+  	-o-transform: translate(-50%, -50%);
+  	transform: translate(-50%, -50%);
+  }
+
+  @media screen and (orientation: portrait) {
+    img.ri {
+        max-width: 90%;
+    }
+  }
+
+  @media screen and (orientation: landscape) {
+    img.ri {
+        max-height: 90%;
+    }
+  }
+  </style>
+{% endblock  %}
+
+{% block content %}
+<p>
+  <ul>
+  {% for tag in nude.tags %}
+    <li><a href="/tag/{{ tag }}">#{{ tag }}</a></li>
+  {% endfor %}
+  </ul>
+</p>
+
+
+<div>
+  <img class="ri" src="{{ nude.url }}" />
+</div>
+
 {% endblock  %}

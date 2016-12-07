@@ -34,3 +34,4 @@ handlers:
 env_variables:
   GAE_USE_SOCKETS_HTTPLIB: 'anyvalue'
   FIREBASE_PROJECT_ID: 'redneighbor-b'
+  CLOUDINARY_URL: 'cloudinary://733635521161972:rJljH4QNmSF0ZrfzK2tQDw4B4Gg@dl47rxobq'

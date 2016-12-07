@@ -4,16 +4,14 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <meta name="description" content="Introducing Lollipop, a sweet new take on Android.">
+    <meta name="description" content="O Instagram da putaria">
     <meta http-equiv="Content-Language" content="pt-br">
     <title>{% block title %}{% endblock %} Manda Nudes Aê!</title>
 
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Material+Icons|Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
     <link rel="stylesheet" href="//code.getmdl.io/1.2.1/material.min.css">
     <link rel="stylesheet" href="//code.getmdl.io/1.2.1/material.blue_grey-red.min.css" />
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block head %}
     {% endblock %}
   </head>
@@ -21,7 +19,7 @@
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
 
       <div class="mdl-layout__header mdl-layout__header--waterfall">
-        <div class="mdl-layout__header-row">
+        <div class="mdl-layout__header-row" style="padding: 0 16px 0 16px;">
 
           <!--
           <span class="mdl-layout-title">
@@ -43,7 +41,7 @@
         </div>
       </div>
 
-      <main class="mdl-layout__content">
+      <main class="mdl-layout__content" style="height: 100vh;">
         {% block content %}{% endblock %}
       </main>
 
@@ -51,44 +49,19 @@
     </div>
 
 
-    <script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-storage.js"></script>
+    {% block footer %}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script>
-    firebase.initializeApp({
-      apiKey: "AIzaSyBmhEGzwL4wVUcGn6ZZiHBD_Aq0gOgCSaU",
-      authDomain: "redneighbor-b.firebaseapp.com",
-      messagingSenderId: "787208033873",
-      storageBucket: "redneighbor-b.appspot.com"
+    $(document).ready(function() {
+        // console.log( "document loaded" );
     });
 
-    /*
-    var auth = firebase.auth();
-    auth.onAuthStateChanged(function(user) {
-      if (user) {
-        var isAnonymous = user.isAnonymous;
-        var uid = user.uid;
-
-        console.log('Anonymous user signed-in.', user, isAnonymous);
-
-        // document.getElementById('file').disabled = false;
-      } else {
-        console.log('There was no anonymous session. Creating a new anonymous user.');
-        // Sign the user in anonymously since accessing Storage requires the user to be authorized.
-        auth.signInAnonymously();
-      }
+    $(window).on('load', function() {
+        // console.log( "window loaded" );
     });
-    */
-    {% if not DEBUG %}
-    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-    ga('create', 'UA-60395403-2', 'auto');
-    ga('send', 'pageview');
-    {% endif %}
     </script>
 
-    {% block footer %}
-    <script defer src="https://code.getmdl.io/1.2.1/material.min.js"></script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <script defer src="//code.getmdl.io/1.2.1/material.min.js"></script>
     {% endblock %}
   </body>
 </html>
