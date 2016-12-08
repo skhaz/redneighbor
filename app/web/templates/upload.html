@@ -54,8 +54,8 @@
     </div>
 
     <div class="mdl-textfield mdl-js-textfield">
-      <input class="mdl-textfield__input" type="text" id="sample1">
-      <label class="mdl-textfield__label" for="sample1">tags...</label>
+      <input class="mdl-textfield__input" type="text" maxlength="2048" id="tags">
+      <label class="mdl-textfield__label" for="tags">tags...</label>
     </div>
 
     <button id="upload" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" disabled>
@@ -78,6 +78,7 @@
     var container = $('#container');
     var progress = $('#progress');
     var input = $('#input');
+    var tags = $('#tags');
     var upload = document.getElementById('upload')
 
     if (navigator.geolocation) {
@@ -147,6 +148,7 @@
               var url = uploadTask.snapshot.downloadURL;
               upload.disabled = false;
               upload.addEventListener('click', function() {
+                upload.disabled = true;
                 console.log('latlng', lat, lng);
                 console.log('url', url);
 
@@ -154,7 +156,7 @@
                   'lat': lat,
                   'lng': lng,
                   'url': url,
-                  'tags': ''
+                  'tags': tags.val()
                 };
 
                 $.ajax({

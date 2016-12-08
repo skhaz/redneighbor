@@ -26,13 +26,15 @@ def main(project_id):
         '/_ah/remote_api')
 
     # if flush:
-    #from app.models import Nude
-    #nudes = Nude.query()
-    #for nude in nudes:
-    #    nude.deleted = True
-    #    nude.public = False
-    #    nude.put()
-
+    """
+    from app.models import Nude
+    nudes = Nude.query()
+    for nude in nudes:
+        nude.deleted = True
+        nude.public = False
+        nude.put()
+        nude.key.delete()
+    """
     memcache.flush_all()
 
 if __name__ == '__main__':

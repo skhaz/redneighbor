@@ -20,6 +20,8 @@
 {% endblock %}
 
 {% block footer %}
+  {{ super() }}
+
   <script src="//cdnjs.cloudflare.com/ajax/libs/js-marker-clusterer/1.0.0/markerclusterer_compiled.js"></script>
   <script>
   var styledMapArray = [{% include 'gmaps_theme.js' %}];
@@ -115,5 +117,4 @@
   </script>
 
   <script async defer src="//maps.googleapis.com/maps/api/js?callback=initMap&libraries=geometry&key=AIzaSyAoMXjq-vmAOzoJVt8UCBppNaZar2ciy24"></script>
-  {{ super() }}
 {% endblock %}
