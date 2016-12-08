@@ -23,7 +23,7 @@ class UserSchema(BaseSchema):
     last_seen = fields.DateTime(load_from='updated')
 
 
-class NudeSchema(Schema):
+class NudeSchema(BaseSchema):
     key = fields.Function(lambda obj: obj.key.urlsafe())
     lat = fields.Function(lambda obj: obj.location.lat)
     lng = fields.Function(lambda obj: obj.location.lon)
@@ -35,18 +35,20 @@ class NudeSchema(Schema):
     def compose_url(self, data):
         return CloudinaryImage(data.url, type='fetch').build_url(
             width=640,
-            height=480,
-            quality=50,
-            crop='pad',
+            # height=480,
+            quality=90,
+            crop='scale',
             format='jpg',
             angle='exif',
             effect='trim',
-            flags='strip_profile'
+            # gravity='auto',
+            flags='strip_profile',
+            secure=True
         )
 
     @pre_load
     def parse_tags(self, data):
-        lowered = data['tags'].lower()
+        lowered = data.get('tags', '').lower()
         splitted = re.sub(r'[^a-zA-Z0-9 ]', r'', lowered).split()
         data['tags'] = [tag[:32] for tag in set(splitted)]
 

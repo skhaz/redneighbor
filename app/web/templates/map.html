@@ -32,7 +32,7 @@
         center: {lat: {{ lat }}, lng: {{ lng }}},
         zoom: 5,
         minZoom: 5,
-        maxZoom: 21,
+        maxZoom: 20,
         disableDefaultUI: true,
         zoomControl: true
       });
@@ -41,7 +41,7 @@
       map.setMapTypeId('styled_map');
 
       var infowindow = new google.maps.InfoWindow({
-        disableAutoPan: false
+        disableAutoPan: true
       });
 
       var markerCluster = new MarkerClusterer(map, [], { imagePath: '{{ url_for("static", filename="maps/m") }}' });
@@ -53,7 +53,7 @@
         });
 
         google.maps.event.addListener(marker, 'click', function() {
-          var contentString = "<img style='width:128px;height:128px;' src='"+  marker.data.url + "'>";
+          var contentString = "<img style='max-height:240px;' src='"+  marker.data.url + "'>";
 
           infowindow.close();
           infowindow.setContent(contentString);
@@ -66,7 +66,7 @@
       var centeredAt = new google.maps.LatLng();
 
       google.maps.event.addListener(map, 'idle', function() {
-        if (google.maps.geometry.spherical.computeDistanceBetween(map.getCenter(), centeredAt) < 500) {
+        if (google.maps.geometry.spherical.computeDistanceBetween(map.getCenter(), centeredAt) < 1000) {
           return;
         }
 
@@ -98,7 +98,7 @@
           '&limit=' + 1000;
 
         $.getJSON(url, function(payload) {
-          $.each(payload.nudes, function(index, data) {
+          $.each(payload.result, function(index, data) {
             addMarker(data);
           });
         })

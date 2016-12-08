@@ -8,8 +8,7 @@ class TagResource(Resource):
         self.schema = TagSchema()
 
     def get(self, key):
-        """Return a tag with a list of nudes
-        """
+        """Return a tag with a list of nudes"""
 
 
 class TagListResource(Resource):

@@ -4,87 +4,65 @@
 {% block head %}
   {{ super() }}
   <style>
-  .demo-card-wide.mdl-card {
-    width: 100%;
-    max-width: 512px;
-    margin: 0 auto;
-  }
-  .demo-card-wide > .mdl-card__title {
-    color: #fff;
-    height: 320px;
-    max-height: 320px;
-    min-height: 320px;
-    background: url('http://freeiconbox.com/icon/256/17992.png') center / cover;
-  }
-  .demo-card-wide > .mdl-card__menu {
-    color: #fff;
-  }
-
   .mdl-layout__content {
-    padding: 20px;
+    padding: 16px;
   }
 
   .mdl-textfield {
-    width: 100%;
+    margin: 16px;
+  }
+
+  .form {
+    margin: 8px;
   }
 
   img#preview {
-    height: 320px;
-    max-height: 320px;
-    min-height: 320px;
-
-    width: 100%;
-    max-width: 512px;
-    margin: 0 auto;
+    max-width: 100%;
+    max-height: 300px;
+    position: absolute;
+    margin: auto;
+    top: 0; bottom: 0;
+    left: 0; right: 0;
   }
 
+  div#container {
+    width: 320px;
+    height: 320px;
+    position: relative;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    margin: auto;
+    left: 0; right: 0;
+  }
+
+  button#upload {
+    float: right;
+    margin: 16px;
+  }
   </style>
 {% endblock %}
 
 
 {% block content %}
+  <input type="file" id="input" name="file" accept="image/*" required style="position: fixed; top: -100em" />
 
-  <input type="file" id="input" name="file" style="position: fixed; top: -100em" />
+  <div class="form">
 
-  <img id="preview" src="http://freeiconbox.com/icon/256/17992.png" /> <!-- //:0 -->
+    <div id="container">
+      <img id="preview" src="//:0" />
 
-  <!--
-  <div class="mdl-card mdl-shadow--2dp demo-card-wide">
-
-      <div id="preview" class="mdl-card__title">
-        <div id="progress" class="mdl-progress mdl-js-progress mdl-progress__indeterminate"></div>
-
-        <div id="background" class="translucent"></div>
-      </div>
-
-      <div class="mdl-card__supporting-text">
-        <div class="mdl-textfield mdl-js-textfield">
-          <input class="mdl-textfield__input" type="text" id="sample1">
-          <label class="mdl-textfield__label" for="sample1">tags...</label>
-        </div>
-      </div>
-
-      <div class="mdl-card__actions mdl-card--border">
-        <button id="upload" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" disabled>
-          enviar
-        </button>
-      </div>
-
-      <div class="mdl-card__menu">
-        <button id="demo-menu-lower-right"
-          class="mdl-button mdl-js-button mdl-button--icon">
-          <i class="material-icons">more_vert</i>
-        </button>
-
-        <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
-            for="demo-menu-lower-right">
-          <li class="mdl-menu__item">Some Action</li>
-          <li class="mdl-menu__item">Another Action</li>
-        </ul>
-
-      </div>
+      <div id="progress" class="mdl-progress mdl-js-progress"></div>
     </div>
-  -->
+
+    <div class="mdl-textfield mdl-js-textfield">
+      <input class="mdl-textfield__input" type="text" id="sample1">
+      <label class="mdl-textfield__label" for="sample1">tags...</label>
+    </div>
+
+    <button id="upload" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" disabled>
+      enviar
+    </button>
+
+  </div>
 
 {% endblock %}
 
@@ -92,29 +70,120 @@
   {{ super() }}
   <script>
   $(document).ready(function() {
+    var storageRef = firebase.storage().ref();
+
+    var lat = {{ lat }}
+    var lng = {{ lng }}
     var preview = $('#preview');
+    var container = $('#container');
     var progress = $('#progress');
     var input = $('#input');
-    var upload = $('#upload');
+    var upload = document.getElementById('upload')
 
-    upload.disabled = true;
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        lat = position.coords.latitude;
+        lng = position.coords.longitude;
+      },
+      function (error) {
+        if (error.code == error.PERMISSION_DENIED) {
+          //
+        }
+      });
+    }
 
     progress.hide();
+    preview.attr('src', '//:0');
 
-    preview.click(function() {
-      input.click();
-    });
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log('displayName', user.displayName);
+        console.log('email', user.email);
+        console.log('uid', user.uid);
 
-    input.change(function(event) {
-      var file = event.target.files[0];
+        user.getToken().then(function(accessToken) {
+          console.log('accessToken', accessToken);
 
-      if (FileReader && file) {
-          var reader = new FileReader();
-          reader.onload = function () {
-            upload.disabled = false;
-            preview.attr('src', reader.result);
-          }
-          reader.readAsDataURL(file);
+          container.click(function() {
+            input.click();
+          });
+
+          input.change(function(event) {
+            var file = event.target.files[0];
+
+            if (FileReader && file) {
+                var reader = new FileReader();
+                reader.onload = function () {
+                  progress.show();
+                  preview.attr('src', reader.result);
+                }
+                reader.readAsDataURL(file);
+            }
+
+            var uid = user.uid;
+            var now = new Date();
+            var year = now.getUTCFullYear();
+            var month = now.getUTCMonth() + 1;
+            var day = now.getUTCDate();
+            var p1 = uid.slice(0, 3);
+            var filename = file.name.replace(/[^A-Z0-9]+/ig, "-");
+            var path = [year, month, day, p1, filename].join("/");
+
+            var metadata = {
+              contentType: file.type,
+              customMetadata: {
+                user: uid
+              }
+            };
+
+            var uploadTask = storageRef.child(path).put(file, metadata);
+            uploadTask.on('state_changed', function(snapshot) {
+              var uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              console.log(uploadProgress);
+              progress[0].MaterialProgress.setProgress(uploadProgress);
+            }, function(error) {
+              alert(error);
+            }, function() {
+              var url = uploadTask.snapshot.downloadURL;
+              upload.disabled = false;
+              upload.addEventListener('click', function() {
+                console.log('latlng', lat, lng);
+                console.log('url', url);
+
+                var data = {
+                  'lat': lat,
+                  'lng': lng,
+                  'url': url,
+                  'tags': ''
+                };
+
+                $.ajax({
+                  url: '/api/v1/nudes',
+                  type: 'POST',
+                  data: JSON.stringify(data),
+                  dataType: 'json',
+                  contentType: 'application/json; charset=utf-8',
+
+                  beforeSend: function(request) {
+                    request.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+                  },
+
+                  success: function(result) {
+                    console.log(result);
+                    // window.location.href = '/nude/' + result.key;
+                    window.location.replace("/")
+                  },
+
+                  failure: function(error) {
+                    alert(error);
+                  }
+                });
+              });
+            });
+          });
+        });
+      } else {
+        window.location.replace("/login")
       }
     });
   });
