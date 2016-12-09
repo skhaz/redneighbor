@@ -74,6 +74,5 @@ class NudeListResource(Resource):
         nude.location = ndb.GeoPt(result['lat'], result['lng'])
         nude.url = result['url']
         nude.tags = result['tags']
-        nude.public = True # temporary
         nude.put()
         return self.schema.dump(nude).data

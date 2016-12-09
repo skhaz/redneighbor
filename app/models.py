@@ -72,9 +72,8 @@ class Nude(ndb.Model):
 
     def _pre_put_hook(self):
         if self.key.id() is None:
-            logging.info('model has been created: %r' % self)
-        else:
-            logging.info('model has been updated: %r' % self)
+            from app.bot import notify
+            deferred.defer(notify, self.url)
 
     @classmethod
     def _update_index(cls, key, version):

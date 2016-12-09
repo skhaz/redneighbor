@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from os import getenv
 from requests_toolbelt.adapters import appengine; appengine.monkeypatch()
+import urllib3; urllib3.disable_warnings()
 from google.appengine.ext.appstats import recording
 
 from flask import Flask
@@ -46,6 +47,9 @@ def _configure_blueprints(app):
 
     from app.web.views import site as site_blueprint
     app.register_blueprint(site_blueprint)
+
+    from app.bot import blueprint as bot_blueprint
+    app.register_blueprint(bot_blueprint)
 
 
 def _configure_error_handlers(app):

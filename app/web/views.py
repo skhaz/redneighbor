@@ -2,12 +2,13 @@
 from flask import Blueprint, request, render_template
 from google.appengine.ext import ndb
 
+from app.schemas import NudeSchema
 from app.kernel.cache import cache
 
 X_APPENGINE_REGION = 'X-AppEngine-Region'
 X_APPENGINE_CITY = 'X-AppEngine-City'
 X_APPENGINE_CITYLATLONG = 'X-AppEngine-CityLatLong'
-DEFAULT_COORDINATES = '0,0'
+DEFAULT_COORDINATES = '-14.1014211,-50.7475316'
 
 site = Blueprint('site', __name__, template_folder='templates')
 
@@ -42,7 +43,8 @@ def upload():
 #@cache.cached(timeout=600)
 def nude(key):
     nude = ndb.Key(urlsafe=key).get()
-    return render_template('nude.html', nude=nude)
+    schema = NudeSchema()
+    return render_template('nude.html', nude=schema.dump(nude).data)
 
 
 @site.route('/tag/<string:key>')

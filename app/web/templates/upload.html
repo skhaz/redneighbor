@@ -82,7 +82,7 @@
     var upload = document.getElementById('upload')
 
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function(position) {
+      navigator.geolocation.watchPosition(function(position) {
         lat = position.coords.latitude;
         lng = position.coords.longitude;
       },
@@ -111,8 +111,11 @@
 
           input.change(function(event) {
             var file = event.target.files[0];
+            if (file == null) {
+              return;
+            }
 
-            if (FileReader && file) {
+            if (FileReader) {
                 var reader = new FileReader();
                 reader.onload = function () {
                   progress.show();
@@ -140,7 +143,6 @@
             var uploadTask = storageRef.child(path).put(file, metadata);
             uploadTask.on('state_changed', function(snapshot) {
               var uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              console.log(uploadProgress);
               progress[0].MaterialProgress.setProgress(uploadProgress);
             }, function(error) {
               alert(error);
