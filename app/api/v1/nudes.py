@@ -1,15 +1,20 @@
 # -*- coding: utf-8 -*-
+import json
 import datetime
 from flask import request
 from flask.ext.restful import Resource, abort
 
 from google.appengine.api import search
 from google.appengine.ext import ndb
+from google.appengine.ext import deferred
 
 from app.api.v1.auth import requires_auth, current_user
 from app.models import User, Nude
 from app.schemas import NudeSchema
 from app.kernel.cache import cache, args_cache_key
+from app.bot import moderate as bot_moderate
+
+X_APPENGINE_CITY = 'X-AppEngine-City'
 
 
 class NudeResource(Resource):
@@ -75,4 +80,20 @@ class NudeListResource(Resource):
         nude.url = result['url']
         nude.tags = result['tags']
         nude.put()
+
+        args = {
+            'url': nude.url,
+            'lat': nude.location.lat,
+            'lon': nude.location.lon,
+            'city': request.headers.get(X_APPENGINE_CITY),
+            'ip_addr': request.remote_addr,
+            'email': current_user.email,
+        }
+
+        deferred.defer(
+            bot_moderate,
+            nude.key.urlsafe(),
+            args
+        )
+
         return self.schema.dump(nude).data

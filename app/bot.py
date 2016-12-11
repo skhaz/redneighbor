@@ -1,14 +1,22 @@
 # -*- coding: utf-8 -*-
 import os
 import logging
+import random
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.api import app_identity
 
 from flask import Blueprint, request
 
-from telegram import Bot, Update, ReplyKeyboardMarkup
-from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters
+from telegram import Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import (
+    Dispatcher,
+    CommandHandler,
+    MessageHandler,
+    CallbackQueryHandler,
+    Filters
+)
+
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -22,21 +30,53 @@ bot = Bot(token)
 dispatcher = None
 
 
-def error(bot, update, error):
-    logger.warn('Update "%s" caused error "%s"' % (update, error))
+def moderate(key, args):
+    lat = args.get('lat', '0.0')
+    lon = args.get('lon', '0.0')
+    url = args.get('url', '')
+    city = args.get('city', 'N/A')
+    email = args.get('email', '')
+    caption = "%s (%s, %s)\n%s" % (city.capitalize(), lat, lon, email)
+
+    keyboard = [[InlineKeyboardButton("👍", callback_data='u-%s' % key),
+                 InlineKeyboardButton("👎", callback_data='d-%s' % key)]]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    bot.sendPhoto(chat_id=147441483, caption=caption, photo=url, reply_markup=reply_markup)
+
+
+def button(bot, update):
+    query = update.callback_query
+    action, key = query.data.split('-')
+    keyboard = [[InlineKeyboardButton("👍", callback_data='u-%s' % key),
+                 InlineKeyboardButton("👎", callback_data='d-%s' % key)]]
+
+    from app.models import Nude
+    nude = ndb.Key(urlsafe=key).get()
+    nude.public = True if action == 'u' else False
+    nude.put()
+
+    bot.editMessageCaption(
+        caption="%s" % action,
+        chat_id=query.message.chat_id,
+        message_id=query.message.message_id,
+        reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 def echo(bot, update):
-    logger.info('update.message.chat_id %s' % update.message.chat_id)
-    update.message.reply_text(update.message.text)
+    quotes = [
+        "Meu direito é ficar calado, não quero falar com bandeirantes.",
+        "Eu gosto da câmera, o microfone pra mim é tudo",
+        "Ah morre, DIABO!",
+        "To falanu, num to falanu!? Não quero falar com você! Não interessa, isso é problema meu Eu quero é que você se foda seu filho duma puta!",
+        "Não é a mamãe!!!",
+    ]
+
+    update.message.reply_text(random.choice(quotes))
 
 
-def notify(url):
-    chat_id = 147441483
-    custom_keyboard = ['Aprovar', 'Remover']
-
-    # bot.sendMessage(chat_id=147441483, text="I'm sorry Dave I'm afraid I can't do that. %s" % key)
-    bot.sendPhoto(chat_id=chat_id, photo=url)
+def error(bot, update, error):
+    logger.warn('Update "%s" caused error "%s"' % (update, error))
 
 
 @blueprint.before_app_first_request
@@ -44,6 +84,7 @@ def setup_webhook():
     global dispatcher
 
     dispatcher = Dispatcher(bot=bot, update_queue=None, workers=0)
+    dispatcher.add_handler(CallbackQueryHandler(button))
     dispatcher.add_handler(MessageHandler(Filters.text, echo))
     dispatcher.add_error_handler(error)
 
