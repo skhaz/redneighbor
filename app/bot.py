@@ -8,6 +8,7 @@ from google.appengine.api import app_identity
 
 from flask import Blueprint, request
 
+from emoji import emojize
 from telegram import Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Dispatcher,
@@ -29,6 +30,9 @@ token = os.environ['TELEGRAM_TOKEN']
 bot = Bot(token)
 dispatcher = None
 
+THUMBS_UP = emojize(":thumbs_up_sign:")
+THUMBS_DOWN = emojize(":thumbs_down_sign:")
+
 
 def moderate(key, args):
     lat = args.get('lat', '0.0')
@@ -38,8 +42,8 @@ def moderate(key, args):
     email = args.get('email', '')
     caption = "%s (%s, %s)\n%s" % (city.capitalize(), lat, lon, email)
 
-    keyboard = [[InlineKeyboardButton("👍", callback_data='u-%s' % key),
-                 InlineKeyboardButton("👎", callback_data='d-%s' % key)]]
+    keyboard = [[InlineKeyboardButton(THUMBS_UP, callback_data=u'%s-%s' % (THUMBS_UP, key)),
+                 InlineKeyboardButton(THUMBS_DOWN, callback_data=u'%s-%s' % (THUMBS_DOWN, key))]]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
     bot.sendPhoto(chat_id=147441483, caption=caption, photo=url, reply_markup=reply_markup)
@@ -48,12 +52,12 @@ def moderate(key, args):
 def button(bot, update):
     query = update.callback_query
     action, key = query.data.split('-')
-    keyboard = [[InlineKeyboardButton("👍", callback_data='u-%s' % key),
-                 InlineKeyboardButton("👎", callback_data='d-%s' % key)]]
+    keyboard = [[InlineKeyboardButton(THUMBS_UP, callback_data=u'%s-%s' % (THUMBS_UP, key)),
+                 InlineKeyboardButton(THUMBS_DOWN, callback_data=u'%s-%s' % (THUMBS_DOWN, key))]]
 
     from app.models import Nude
     nude = ndb.Key(urlsafe=key).get()
-    nude.public = True if action == 'u' else False
+    nude.public = True if action == THUMBS_UP else False
     nude.put()
 
     bot.editMessageCaption(
