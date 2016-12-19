@@ -118,9 +118,13 @@
             if (FileReader) {
                 var reader = new FileReader();
                 reader.onload = function () {
+                  // preview.load(function() {
+                  //  console.log(preview.width, preview.height);
+                  // });
                   progress.show();
                   preview.attr('src', reader.result);
                 }
+
                 reader.readAsDataURL(file);
             }
 

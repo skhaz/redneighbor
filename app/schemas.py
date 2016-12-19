@@ -35,13 +35,11 @@ class NudeSchema(BaseSchema):
     def compose_url(self, data):
         return CloudinaryImage(data.url, type='fetch').build_url(
             width=640,
-            # height=480,
             quality=90,
             crop='scale',
             format='jpg',
             angle='exif',
             effect='trim',
-            # gravity='auto',
             flags='strip_profile',
             secure=True
         )

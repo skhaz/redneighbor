@@ -42,12 +42,62 @@
       map.mapTypes.set('styled_map', new google.maps.StyledMapType(styledMapArray));
       map.setMapTypeId('styled_map');
 
+      $(window).bind('hashchange', function () {
+        var hash = window.location.hash.slice(1);
+        if (hash) {
+          var values = hash.split(',');
+          console.log(values);
+        }
+      });
+
       var infowindow = new google.maps.InfoWindow({
-        disableAutoPan: false
+        disableAutoPan: false,
       });
 
       var markers = [];
-      var markerCluster = new MarkerClusterer(map, [], { imagePath: '{{ url_for("static", filename="maps/m") }}' });
+      var markerCluster = new MarkerClusterer(map, [], {
+        imagePath: '{{ url_for("static", filename="maps/m") }}',
+        maxZoom: 21,
+        zoomOnClick: false
+      });
+
+      google.maps.event.addListener(markerCluster, 'clusterclick', function(cluster) {
+        var clusterMarkers = cluster.getMarkers();
+
+        if (map.getZoom() < 18 && clusterMarkers.length > 2) {
+          map.fitBounds(cluster.getBounds());
+          return;
+        }
+
+        var contentString = new String();
+        contentString += [
+          "<div class='row' style='overflow-y: scroll; max-height: 300px;'>",
+          " <div>",
+          "  <ul>",
+        ].join('\n');;
+
+        for (i = 0; i < clusterMarkers.length; i++) {
+          var marker = clusterMarkers[i];
+          contentString += [
+            "   <li>",
+            "     <a href='" + '/nude/' + marker.data.key + "'>",
+            "       <img style='border: 0; max-height:240px;' src='"+  marker.data.url + "' />",
+            "     </a>",
+            "   </li>",
+          ].join('\n');
+        }
+
+        contentString += [
+          "  </ul>",
+          " </div>",
+          "</div>"
+        ].join('\n');;
+
+        infowindow.close();
+        infowindow.setContent(contentString);
+        infowindow.setPosition(clusterMarkers[0].getPosition());
+        infowindow.open(map);
+      });
 
       function addMarker(data) {
         for (i = 0; i < markers.length; i++) {
@@ -55,8 +105,6 @@
               return;
             }
         }
-
-        // TODO unir todos duplicados em apenas um
 
         var marker = new google.maps.Marker({
           key: data.key,
@@ -83,13 +131,16 @@
       var centeredAt = new google.maps.LatLng();
 
       google.maps.event.addListener(map, 'idle', function() {
-        if (google.maps.geometry.spherical.computeDistanceBetween(map.getCenter(), centeredAt) < 5000) {
-          return;
-        }
-
-        var radius = 6378.8;
         var bounds = map.getBounds();
         var center = bounds.getCenter();
+
+        window.location = '#' + [
+          center.lat(),
+          center.lng(),
+          map.getZoom()
+        ].join(',');
+
+        var radius = 6378.8;
         var lat = center.lat();
         var lng = center.lng();
         var ne = bounds.getNorthEast();
@@ -123,7 +174,7 @@
       });
 
       google.maps.event.addListener(map, "click", function(event) {
-        infowindow.close();
+        // infowindow.close();
       });
     });
   }
