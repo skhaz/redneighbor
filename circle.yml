@@ -15,6 +15,10 @@ dependencies:
     # Workaround bug in gcloud
     - gcloud config set app/use_gsutil true
 
+test:
+  override:
+    - if [[ $CIRCLE_BRANCH != "ci" ]] ; then <test-command> ; fi
+
 deployment:
   production:
     branch: master
