@@ -53,13 +53,9 @@ def upload():
 @site.route('/nude/<string:key>')
 #@cache.cached(timeout=600)
 def nude(key):
-    # TODO refactor
-    if key.endswith('.xml'):
-        # TODO sitemap
-    else:
-        nude = ndb.Key(urlsafe=key).get()
-        schema = NudeSchema()
-        return render_template('nude.html', nude=schema.dump(nude).data)
+    nude = ndb.Key(urlsafe=key).get()
+    schema = NudeSchema()
+    return render_template('nude.html', nude=schema.dump(nude).data)
 
 
 @site.route('/tag/<string:key>')
