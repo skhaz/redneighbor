@@ -4,7 +4,7 @@ machine:
     PYTHONPATH: ${PYTHONPATH}:${HOME}/google_appengine
 
     # Replace this with your project ID
-    GCLOUD_PROJECT: "redneighbor-b"
+    GCLOUD_PROJECT: "redneighbor-g"
 
 dependencies:
   pre:
@@ -30,7 +30,7 @@ dependencies:
 test:
   override:
     # run local unit tests
-    - python -c 'print("tests")'
+    - python -c 'print("")'
 
 deployment:
     staging:

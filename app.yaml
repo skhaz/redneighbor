@@ -31,7 +31,7 @@ handlers:
 
 env_variables:
   GAE_USE_SOCKETS_HTTPLIB: 'anyvalue'
-  FIREBASE_PROJECT_ID: 'redneighbor-b'
+  FIREBASE_PROJECT_ID: 'redneighbor-g'
   CLOUDINARY_URL: 'cloudinary://733635521161972:rJljH4QNmSF0ZrfzK2tQDw4B4Gg@dl47rxobq'
   TELEGRAM_TOKEN: '313362333:AAHdAhSO29g_cMY3qDzLDa4A3uM4F5lzWmk'
 
