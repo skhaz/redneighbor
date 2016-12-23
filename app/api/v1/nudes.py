@@ -74,11 +74,11 @@ class NudeListResource(Resource):
     @requires_auth
     def post(self):
         self.schema.context = {'user': current_user}
-        # result, errors = self.schema.load(request.get_json(), partial=True)
-        result = request.get_json()
+        result, errors = self.schema.load(request.get_json(), partial=True)
+
         nude = Nude()
         nude.owner = current_user.key
-        nude.location = ndb.GeoPt(result['lat'], result['lng'])
+        # nude.location = ndb.GeoPt(result['lat'], result['lng'])
         nude.url = result['url']
         nude.tags = result['tags']
         nude.put()
