@@ -23,7 +23,7 @@ deployment:
   production:
     branch: master
     commands:
-    - gcloud -q preview app deploy app.yaml --promote --version=1
+    - gcloud app deploy app.yaml --promote --version=1
 
   staging:
     branch: /.*/
