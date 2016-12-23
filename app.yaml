@@ -35,6 +35,6 @@ env_variables:
   CLOUDINARY_URL: 'cloudinary://733635521161972:rJljH4QNmSF0ZrfzK2tQDw4B4Gg@dl47rxobq'
   TELEGRAM_TOKEN: '313362333:AAHdAhSO29g_cMY3qDzLDa4A3uM4F5lzWmk'
 
-# Temporary workaround around gcloud issue
-# skip_files:
-# - ^venv/.*$
+Temporary workaround around gcloud issue
+skip_files:
+  - ^venv/.*$
