@@ -35,6 +35,7 @@ deployment:
         branch: master
         commands:
         # Deploy to AppEngine
-        - gcloud -q preview app deploy app.yaml --promote --version=1
+        - gcloud -q app deploy app.yaml --promote --version=1
+
         # Run our E2E Test
         # - python e2e_test.py
