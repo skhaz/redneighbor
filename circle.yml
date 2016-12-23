@@ -17,7 +17,7 @@ dependencies:
 
 test:
   override:
-    - if [[ $CIRCLE_BRANCH != "ci" ]] ; then <test-command> ; fi
+    - echo 'test'
 
 deployment:
   production:
