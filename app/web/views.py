@@ -20,38 +20,34 @@ bucket_name = os.environ.get('BUCKET_NAME',
                              app_identity.get_default_gcs_bucket_name())
 
 
-# XXX temp
-from app.tasks import build
-
 def geolocation_cache_key():
     args = str(hash(request.headers.get(X_APPENGINE_CITYLATLONG)))
     return (request.path + args).encode('utf-8')
 
 
 @site.route('/')
-#@cache.cached(timeout=3600, key_prefix=geolocation_cache_key)
+@cache.cached(timeout=3600, key_prefix=geolocation_cache_key)
 def index():
-    ##### build()
     import logging
     lat, lng = request.headers.get(X_APPENGINE_CITYLATLONG, DEFAULT_COORDINATES).split(',')
     return render_template('map.html', **locals())
 
 
 @site.route('/login')
-#@cache.cached(timeout=600)
+@cache.cached(timeout=600)
 def login():
     return render_template('login.html', **locals())
 
 
 @site.route('/upload')
-#@cache.cached(timeout=3600, key_prefix=geolocation_cache_key)
+@cache.cached(timeout=3600, key_prefix=geolocation_cache_key)
 def upload():
     lat, lng = request.headers.get(X_APPENGINE_CITYLATLONG, DEFAULT_COORDINATES).split(',')
     return render_template('upload.html', **locals())
 
 
 @site.route('/nude/<string:key>')
-#@cache.cached(timeout=600)
+@cache.cached(timeout=600)
 def nude(key):
     nude = ndb.Key(urlsafe=key).get()
     schema = NudeSchema()
@@ -59,7 +55,7 @@ def nude(key):
 
 
 @site.route('/tag/<string:key>')
-#@cache.cached(timeout=600)
+@cache.cached(timeout=600)
 def tag(key):
     return render_template('tag.html')
 
@@ -68,11 +64,6 @@ def tag(key):
 def admin():
     return render_template('admin.html')
 
-
-
-"""
-@site.route('/', defaults={'path': ''})
-@site.route('/<path:path>')"""
 
 @site.route('/robots.txt')
 @cache.cached(timeout=3600)
