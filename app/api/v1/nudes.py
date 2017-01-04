@@ -37,7 +37,6 @@ class NudeResource(Resource):
         nude = self._get(key)
         if current_user.owns(nude):
             nude.public = False
-            nude.deleted = True
             nude.put()
         else:
             abort(403)

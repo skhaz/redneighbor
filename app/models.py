@@ -39,6 +39,9 @@ class User(ndb.Model):
 
     def __repr__(self):
         return "%s(%s)" % (self.__class__.__name__, self.key.id())
+        # TODO     def __repr__(self):
+        #  return '<User(email={self.email!r})>'.format(self=self)
+
 
 
 class Nude(ndb.Model):
@@ -54,7 +57,6 @@ class Nude(ndb.Model):
     tags = ndb.StringProperty(repeated=True, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
-    deleted = ndb.BooleanProperty(default=False)
 
     def __repr__(self):
         return "%s(%s)" % (self.__class__.__name__, self.key.id())
@@ -83,7 +85,7 @@ class Nude(ndb.Model):
                 logging.warning(msg)
                 raise Exception(msg)
             index = search.Index(name=cls._INDEX_NAME)
-            if not entity.public or entity.deleted:
+            if not entity.public:
                 index.delete(key.urlsafe())
                 return
             point = search.GeoPoint(entity.location.lat, entity.location.lon)
