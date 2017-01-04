@@ -16,7 +16,7 @@ class BaseSchema(Schema):
 class LatLngField(fields.Field):
 
     def _serialize(self, value, attr, obj):
-        raise {'lat': value.lat, 'lng': value.lon}
+        return {'lat': value.lat, 'lng': value.lon}
 
     def _deserialize(self, value, attr, ob):
         return ndb.GeoPtProperty(attr['lat'], attr['lng'])
