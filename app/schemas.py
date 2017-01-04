@@ -15,11 +15,11 @@ class BaseSchema(Schema):
 
 class LatLngField(fields.Field):
 
-    def to_representation(self, value):
-        return [value.lat, value.lon]
+    def _serialize(self, value, attr, obj):
+        raise {'lat': value.lat, 'lng': value.lon}
 
-    def to_internal_value(self, data):
-        return ndb.GeoPtProperty(data[1], data[0])
+    def _deserialize(self, value, attr, ob):
+        return ndb.GeoPtProperty(attr['lat'], attr['lng'])
 
 
 class UserSchema(BaseSchema):
