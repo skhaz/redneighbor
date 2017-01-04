@@ -58,3 +58,7 @@ class NudeSchema(BaseSchema):
         lowered = data.get('tags', '').lower()
         splitted = re.sub(r'[^a-zA-Z0-9 ]', r'', lowered).split()
         data['tags'] = [tag[:32] for tag in set(splitted)]
+
+
+class TagSchema(BaseSchema):
+    key = fields.Function(lambda obj: obj.key.urlsafe())
