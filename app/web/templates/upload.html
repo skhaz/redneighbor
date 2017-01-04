@@ -158,10 +158,12 @@
                 console.log('url', url);
 
                 var data = {
-                  'lat': lat,
-                  'lng': lng,
                   'url': url,
-                  'tags': tags.val()
+                  'tags': tags.val(),
+                  'location' {
+                    'lat': lat,
+                    'lng': lng
+                  }
                 };
 
                 $.ajax({
