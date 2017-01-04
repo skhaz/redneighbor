@@ -19,7 +19,7 @@ class LatLngField(fields.Field):
         return {'lat': value.lat, 'lng': value.lon}
 
     def _deserialize(self, value, attr, ob):
-        return ndb.GeoPtProperty(attr['lat'], attr['lng'])
+        return ndb.GeoPtProperty(value['lat'], value['lng'])
 
 
 class UserSchema(BaseSchema):
