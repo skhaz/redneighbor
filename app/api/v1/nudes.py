@@ -79,7 +79,7 @@ class NudeListResource(Resource):
         logging.warn(result)
         nude = Nude()
         nude.owner = current_user.key
-        nude.location = ndb.GeoPt(-23.271321921339293, -47.05713004687499) # result['lat'], result['lng'])
+        nude.location = result['location']
         nude.url = result['url']
         nude.tags = result['tags']
         nude.put()
