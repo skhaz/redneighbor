@@ -75,8 +75,6 @@ class NudeListResource(Resource):
         self.schema.context = {'user': current_user}
         result, errors = self.schema.load(request.get_json(), partial=True)
 
-        import logging
-        logging.warn(result)
         nude = Nude()
         nude.owner = current_user.key
         nude.location = result['location']
