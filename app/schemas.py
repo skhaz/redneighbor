@@ -13,11 +13,6 @@ class BaseSchema(Schema):
         return {'result': data} if many else data
 
 
-"""
-    # lat = fields.Float(attribute='location.lat', load_from='location.lat')
-    # lng = fields.Float(attribute='location.lon', load_from='location.lon')
-"""
-
 class LatLngField(fields.Field):
 
     def to_representation(self, value):

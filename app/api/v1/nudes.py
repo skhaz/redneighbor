@@ -100,3 +100,7 @@ class NudeListResource(Resource):
         )
 
         return self.schema.dump(nude).data
+
+
+class TagSchema(BaseSchema):
+    key = fields.Function(lambda obj: obj.key.urlsafe())
