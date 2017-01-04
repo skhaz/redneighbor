@@ -19,12 +19,6 @@ class LatLngField(fields.Field):
         return {'lat': value.lat, 'lng': value.lon}
 
     def _deserialize(self, value, attr, ob):
-        import logging
-        logging.warn('value', value)
-        logging.warn('self', self)
-        logging.warn('attr', attr)
-        logging.warn('ob', ob)
-
         return ndb.GeoPt(value['lat'], value['lng'])
 
 
