@@ -40,7 +40,7 @@ class UserSchema(BaseSchema):
 
 class NudeSchema(BaseSchema):
     key = fields.Function(lambda obj: obj.key.urlsafe())
-    location = GeoField()
+    location = LatLngField()
     tags = fields.List(fields.String)
     gender = fields.String(load_from='owner.gender')
     updated = fields.DateTime(dump_only=True)
