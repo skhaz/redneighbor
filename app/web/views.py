@@ -65,15 +65,16 @@ def admin():
     return render_template('admin.html')
 
 
-@site.route('/robots.txt')
+@site.route('/robots.txt', defaults={'filename': 'robots.txt'})
+@site.route('/sitemap.xml', defaults={'filename': 'sitemap.xml'})
 @cache.cached(timeout=3600)
-def robots():
-    filename = '/' + bucket_name + '/static/robots.txt'
+def webcrawler(filename):
+    fullpath = '/{}/static/{}'.format(bucket_name, filename)
     try:
-        stat = gcs.stat(filename)
+        stat = gcs.stat(fullpath)
     except gcs.NotFoundError:
         return abort(404)
-    gcs_file = gcs.open(filename)
+    gcs_file = gcs.open(fullpath)
     response = make_response(gcs_file.read())
     gcs_file.close()
     response.mimetype = stat.content_type

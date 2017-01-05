@@ -27,7 +27,7 @@ def build():
           {% for result in results -%}
           <url>
             <loc>{{ domain }}/nude/{{ result.key.urlsafe() }}</loc>
-            <lastmod>{{ date.strftime('%Y-%m-%d') }}</lastmod>
+            <lastmod>{{ result.updated.strftime('%Y-%m-%d') }}</lastmod>
             <changefreq>daily</changefreq>
             <priority>0.8</priority>
           </url>
@@ -39,18 +39,18 @@ def build():
                                  app_identity.get_default_gcs_bucket_name())
 
     retry_params = gcs.RetryParams(backoff_factor=1.1)
-    query = Nude.query(Nude.public == True)
+    query = Nude.query(Nude.public == True).order(-Nude.updated)
     more = True
     cursor = None
     while more:
-        results, cursor, more = query.fetch_page(1000, start_cursor=cursor)
-        filename = 'sitemap_%02d.xml' % 1
+        results, cursor, more = query.fetch_page(25000, start_cursor=cursor)
+        filename = 'sitemap.xml'  # 'sitemap_%02d.xml' % page
         gcs_file = gcs.open(
             '/%s/static/%s' % (bucket_name, filename),
             'w',
             content_type='text/xml',
             retry_params=retry_params)
-        content = sitemap_template.render(results=results, date=datetime.utcnow())
+        content = sitemap_template.render(results=results)
         gcs_file.write(content.encode('utf-8'))
         gcs_file.close()
         sitemaps.append(filename)
