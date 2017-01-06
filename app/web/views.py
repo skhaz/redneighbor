@@ -65,6 +65,11 @@ def admin():
     return render_template('admin.html')
 
 
+@site.errorhandler(404)
+def page_not_found(err):
+    return render_template('404.html')
+
+
 @site.route('/robots.txt', defaults={'filename': 'robots.txt'})
 @site.route('/sitemap.xml', defaults={'filename': 'sitemap.xml'})
 @cache.cached(timeout=3600)
