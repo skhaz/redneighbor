@@ -37,7 +37,7 @@ class NudeSchema(BaseSchema):
     key = fields.Function(lambda obj: obj.key.urlsafe())
     location = LatLngField()
     tags = fields.List(fields.String)
-    gender = fields.String(dump_only=True, load_from='owner.gender')
+    gender = fields.String(dump_only=True, attribute='owner.gender')
     updated = fields.DateTime(dump_only=True)
     url = fields.Method('compose_url')
 
