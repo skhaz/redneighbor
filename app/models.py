@@ -45,7 +45,7 @@ class User(ndb.Model):
 
 
 class Nude(ndb.Model):
-    _INDEX_NAME = 'nude_index_01'
+    _INDEX_NAME = 'nude_index_0001'
     _QUEUE_NAME = 'index'
 
     url = ndb.TextProperty()

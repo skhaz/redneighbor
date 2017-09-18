@@ -16,7 +16,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.remote_api import remote_api_stub
 from google.appengine.api import memcache
 
-os.environ['HTTP_HOST'] = "%s.appspot.com" % 'redneighbor-b'
+os.environ['HTTP_HOST'] = "%s.appspot.com" % 'redneighbor-g'
 sys.path.insert(1, '..')
 
 
@@ -26,7 +26,6 @@ def main(project_id):
         '/_ah/remote_api')
 
     # if flush:
-    """
     from app.models import Nude
     nudes = Nude.query()
     for nude in nudes:
@@ -34,7 +33,6 @@ def main(project_id):
         nude.public = False
         nude.put()
         nude.key.delete()
-    """
     memcache.flush_all()
 
 if __name__ == '__main__':
