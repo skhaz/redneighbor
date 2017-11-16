@@ -12,6 +12,6 @@ indexes:
 
 - kind: Nude
   properties:
-  - name: owner
+  - name: public
   - name: updated
     direction: desc

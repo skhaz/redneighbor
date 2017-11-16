@@ -60,6 +60,9 @@ def button(bot, update):
     nude.public = True if action == THUMBS_UP else False
     nude.put()
 
+    from app.tasks import build
+    deferred.defer(build)
+
     bot.editMessageCaption(
         caption="%s" % action,
         chat_id=query.message.chat_id,
