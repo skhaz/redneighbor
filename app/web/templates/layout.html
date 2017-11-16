@@ -12,6 +12,14 @@
     <link rel="stylesheet" href="//code.getmdl.io/1.2.1/material.min.css">
     <link rel="stylesheet" href="//code.getmdl.io/1.2.1/material.red-deep_purple.min.css" />
 
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-60395403-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-60395403-2');
+    </script>
     {% block head %}
     {% endblock %}
   </head>
@@ -62,6 +70,7 @@
         apiKey: "AIzaSyC6ZCON9bJIhlDPockX_VF_NHVC63WUUHM",
         authDomain: "redneighbor-g.firebaseapp.com",
         databaseURL: "https://redneighbor-g.firebaseio.com",
+        projectId: "redneighbor-g",
         storageBucket: "redneighbor-g.appspot.com",
         messagingSenderId: "558208397557"
       };
