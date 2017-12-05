@@ -61,7 +61,7 @@ def main(project_id):
     # populate_with_fakes()
     from os.path import dirname, join, realpath
     csv_files = glob.glob(join(dirname(realpath(sys.argv[0])), '*.csv'))
-    df = pd.concat((pd.read_csv(csv) for csv in csv_files), ignore_index=True)
+    df = pd.concat((pd.read_csv(csv) for csv in csv_files), header=None)
     print(df)
 
 
