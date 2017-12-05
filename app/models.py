@@ -57,7 +57,7 @@ class Nude(ndb.Model):
     tags = ndb.StringProperty(repeated=True, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
-    is_fake = ndb.BooleanProperty(default=False)
+    fake = ndb.BooleanProperty(default=False)
 
     def __repr__(self):
         return "%s(%s)" % (self.__class__.__name__, self.key.id())

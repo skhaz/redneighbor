@@ -13,5 +13,6 @@ indexes:
 - kind: Nude
   properties:
   - name: public
+  - name: fake
   - name: updated
     direction: desc

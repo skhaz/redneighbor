@@ -1,6 +1,9 @@
 import os
 import sys
+
+import glob
 import argparse
+import pandas as pd
 
 try:
     import dev_appserver
@@ -20,20 +23,47 @@ os.environ['HTTP_HOST'] = "%s.appspot.com" % 'redneighbor-g'
 sys.path.insert(1, '..')
 
 
+
+def populate_with_fakes():
+    from app import models
+
+    # df = pd.DataFrame(data=d)
+
+    entities = []
+    user_key = 'ag9zfnJlZG5laWdoYm9yLWdyJgsSBFVzZXIiHDdsTklCNVZ4dXJZNGRNTzA2OFZhM2U4T21jcDEM'
+    fake_user = ndb.Key(urlsafe=user_key).get()
+    for data in df:
+        nude = models.Nude()
+        nude.fake = True
+        nude.public = True
+        nude.deleted = False
+
+        nude.location = ndb.GeoPt(data['lat'], data['lng'])
+
+        # upload
+        # TODO nude.url = ?
+        # TODO nude.tags = ?
+
+        nude.owner = fake_user
+        nudes.append(nude)
+    # nude.put()
+
+    # end
+    ndb.put_multi(entities)
+    memcache.flush_all()
+
+
 def main(project_id):
     remote_api_stub.ConfigureRemoteApiForOAuth(
         '{}.appspot.com'.format(project_id),
         '/_ah/remote_api')
 
-    # if flush:
-    from app.models import Nude
-    nudes = Nude.query()
-    for nude in nudes:
-        nude.deleted = True
-        nude.public = False
-        nude.put()
-        nude.key.delete()
-    memcache.flush_all()
+    # populate_with_fakes()
+    from os.path import dirname, join, realpath
+    csv_files = glob.glob(join(dirname(realpath(sys.argv[0])), '*.csv'))
+    df = pd.concat((pd.read_csv(csv) for csv in csv_files), ignore_index=True)
+    print(df)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
