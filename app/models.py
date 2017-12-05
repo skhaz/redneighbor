@@ -45,7 +45,7 @@ class User(ndb.Model):
 
 
 class Nude(ndb.Model):
-    _INDEX_NAME = 'nude_index_0001'
+    _INDEX_NAME = 'nude_index_666'
     _QUEUE_NAME = 'index'
 
     url = ndb.TextProperty()
@@ -57,6 +57,7 @@ class Nude(ndb.Model):
     tags = ndb.StringProperty(repeated=True, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
+    is_fake = ndb.BooleanProperty(default=False)
 
     def __repr__(self):
         return "%s(%s)" % (self.__class__.__name__, self.key.id())

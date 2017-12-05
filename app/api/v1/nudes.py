@@ -46,7 +46,7 @@ class NudeListResource(Resource):
     def __init__(self):
         self.schema = NudeSchema()
 
-    @cache.cached(timeout=3600, key_prefix=args_cache_key)
+    @cache.cached(timeout=600, key_prefix=args_cache_key)
     def get(self):
         lat = request.args.get('lat', default=0, type=float)
         lng = request.args.get('lng', default=0, type=float)
