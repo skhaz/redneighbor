@@ -8,3 +8,6 @@ cloudinary==1.5.0
 python-telegram-bot==5.2.0
 emoji==0.3.9
 GoogleAppEngineCloudStorageClient==1.9.22.1
+
+pandas==0.21.0
+glob2==0.6

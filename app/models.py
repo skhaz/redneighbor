@@ -59,9 +59,11 @@ class Nude(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True)
     fake = ndb.BooleanProperty(default=False)
 
+    """
     def __repr__(self):
         return "%s(%s)" % (self.__class__.__name__, self.key.id())
         # TODO return '<Nude(name={self.name!r})>'.format(self=self)
+    """
 
     def _pre_put_hook(self):
         self.version = self.version + 1
